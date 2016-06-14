@@ -95,7 +95,7 @@ namespace pocketmine {
     const VERSION = "1.5";
     const API_VERSION = "2.0.0";//API version.(plugin api version)
     const CODENAME = "REACTIVE";
-    const MINECRAFT_VERSION = "v0.15.0 alpha- The Friendly Update";
+    const MINECRAFT_VERSION = "v0.15.0 alpha";
     const MINECRAFT_VERSION_NETWORK = "0.15.0";
 
     /*
