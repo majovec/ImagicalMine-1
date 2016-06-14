@@ -3303,7 +3303,6 @@ if($this->connected === false){
         }
         $timings->stopTiming();
     }
-}
 
     /**
      * Kicks a player from the server
