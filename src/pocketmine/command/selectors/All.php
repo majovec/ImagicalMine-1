@@ -1,7 +1,6 @@
 <?php
-
 /**
- * src/pocketmine/command/Selectors.php
+ * src/pocketmine/command/selectors/All.php
  *
  * @package default
  */
@@ -26,33 +25,24 @@
  * (at your option) any later version.
  *
  * @author ImagicalMine Team
- * @link http://forums.imagicalcorp.ml/
+ * @link http://forums.imagicalcorp.net/
  *
  *
 */
 
 namespace pocketmine\command;
-class Selectors {
-    
-    private $selectors = [];
+use pocketmine\command\Selectors;
+use pocketmine\Server;
+class All extends Selectors {
     
     /*
-    This is executed when executing a command
-    param @content string
+    @select All players of the server
+    Used when parsing the contents
     */
-    
-    public static function parse(string $content, $sender) : string {
-        foreach($this->selectors as $sel) {
-            $content = $sel->parse($content);
+    public function parse(string $content, $sender) {
+        foreach(Server::getInstance()->getOnlinePlayers() as $player) {
+            Server::getInstance()->dispatchCommand($sender, $content);
         }
-        return $content;
+        return null;
     }
-    /*
-    With this, plugins will be able to register selectors give us the ability to add some easilier
-    */
-    public function add(string $selectorName, Selectors $select) {
-        $this->selectors[$selctorName] = $select;
-    }
-    
-    
 }

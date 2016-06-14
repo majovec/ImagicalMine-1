@@ -1,7 +1,6 @@
 <?php
-
 /**
- * src/pocketmine/command/Selectors.php
+ * src/pocketmine/command/selectors/Player.php
  *
  * @package default
  */
@@ -26,33 +25,33 @@
  * (at your option) any later version.
  *
  * @author ImagicalMine Team
- * @link http://forums.imagicalcorp.ml/
+ * @link http://forums.imagicalcorp.net/
  *
  *
 */
 
 namespace pocketmine\command;
-class Selectors {
-    
-    private $selectors = [];
+use pocketmine\command\Selectors;
+use pocketmine\Server;
+use pocketmine\command\ConsoleCommandSender;
+class Player extends Selectors {
     
     /*
-    This is executed when executing a command
-    param @content string
+    @select Select nearest
+    Used when parsing the contents
     */
-    
-    public static function parse(string $content, $sender) : string {
-        foreach($this->selectors as $sel) {
-            $content = $sel->parse($content);
+    public function parse(string $content, $sender) {
+        if(!$sender instanceof ConsoleCommandSender) { // some selectors are custom
+            foreach($sender->getLevel()->getPlayers() as $player){
+                if($player ===! $sender) {
+                    $distance = $sender->distance($player);
+                    if($ld === -1 or $ld > $distance){
+                        $content = str_ireplace("@p ", $player->getName() . " ", $content);
+                        $ld = $distance;
+                    }
+				}
+			}
         }
         return $content;
     }
-    /*
-    With this, plugins will be able to register selectors give us the ability to add some easilier
-    */
-    public function add(string $selectorName, Selectors $select) {
-        $this->selectors[$selctorName] = $select;
-    }
-    
-    
 }

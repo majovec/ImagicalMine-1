@@ -1,7 +1,6 @@
 <?php
-
 /**
- * src/pocketmine/command/Selectors.php
+ * src/pocketmine/command/selectors/Random.php
  *
  * @package default
  */
@@ -26,33 +25,28 @@
  * (at your option) any later version.
  *
  * @author ImagicalMine Team
- * @link http://forums.imagicalcorp.ml/
+ * @link http://forums.imagicalcorp.net/
  *
  *
 */
 
 namespace pocketmine\command;
-class Selectors {
-    
-    private $selectors = [];
+use pocketmine\command\Selectors;
+use pocketmine\Server;
+class Random extends Selectors {
     
     /*
-    This is executed when executing a command
-    param @content string
+    @select Random player in the server
+    Used when parsing the contents
     */
-    
-    public static function parse(string $content, $sender) : string {
-        foreach($this->selectors as $sel) {
-            $content = $sel->parse($content);
-        }
-        return $content;
+    public function parse(string $content, $sender) {
+		$idrand = rand(0, count($this->getServer()->getOnlinePlayers()));
+		$id = 0;
+		foreach($this->getServer()->getOnlinePlayers() as $player) {
+			if($id === $idrand) {
+				$content = str_ireplace("@r ", $player->getName() . " ", $content);
+			}
+			$id++;
+		}
     }
-    /*
-    With this, plugins will be able to register selectors give us the ability to add some easilier
-    */
-    public function add(string $selectorName, Selectors $select) {
-        $this->selectors[$selctorName] = $select;
-    }
-    
-    
 }

@@ -42,6 +42,10 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\command\SimpleCommandMap;
+use pocketmine\command\Selectors;
+use pocketmine\command\selectors\All as SelectorAll;
+use pocketmine\command\selectors\Player as SelectorPlayer;
+use pocketmine\command\selectors\Random as SelectorRand;
 use pocketmine\entity\Arrow;
 use pocketmine\entity\Bat;
 use pocketmine\entity\Blaze;
@@ -268,6 +272,9 @@ class Server {
 
 	/** @var LevelMetadataStore */
 	private $levelMetadata;
+    
+	/** @var Selectors */
+	private $selectors = null;
 
 	/** @var Network */
 	private $network;
@@ -465,6 +472,17 @@ class Server {
 	}
 
 
+	/**
+	 *
+	 * @return Selectors
+	 */
+     
+     
+     public function getSelectors() {
+         return $this->selectors;
+     }
+     
+     
 	/**
 	 *
 	 * @return int
@@ -1798,6 +1816,10 @@ class Server {
 			$this->entityMetadata = new EntityMetadataStore();
 			$this->playerMetadata = new PlayerMetadataStore();
 			$this->levelMetadata = new LevelMetadataStore();
+			$this->selectors = new Selectors();
+            $this->selectors->add(new SelectorAll());
+            $this->selectors->add(new SelectorPlayer());
+            $this->selectors->add(new SelectorRand());
 
 			$this->operators = new Config($this->dataPath . "ops.txt", Config::ENUM);
 			$this->whitelist = new Config($this->dataPath . "white-list.txt", Config::ENUM);
@@ -2195,6 +2217,7 @@ class Server {
 	 * @return bool
 	 */
 	public function dispatchCommand(CommandSender $sender, $commandLine): bool{
+        $commandLine = $this->selectors->parse($commandLine);
 		if ($this->commandMap->dispatch($sender, $commandLine)) {
 			return true;
 		}
