@@ -248,8 +248,9 @@ class SimpleCommandMap implements CommandMap
      */
     public function dispatch(CommandSender $sender, $commandLine)
     {
+           
         $args = explode(" ", $commandLine);
-
+        
         if (count($args) === 0) {
             return false;
         }

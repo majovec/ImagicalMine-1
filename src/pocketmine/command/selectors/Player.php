@@ -30,7 +30,7 @@
  *
 */
 
-namespace pocketmine\command;
+namespace pocketmine\command\selectors;
 use pocketmine\command\Selectors;
 use pocketmine\Server;
 use pocketmine\command\ConsoleCommandSender;
@@ -40,7 +40,7 @@ class Player extends Selectors {
     @select Select nearest
     Used when parsing the contents
     */
-    public function parse(string $content, $sender) {
+    public function parse(string $content, $sender) : string {
         if(!$sender instanceof ConsoleCommandSender) { // some selectors are custom
             foreach($sender->getLevel()->getPlayers() as $player){
                 if($player ===! $sender) {

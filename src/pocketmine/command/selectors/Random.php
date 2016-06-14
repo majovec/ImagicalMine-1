@@ -30,7 +30,7 @@
  *
 */
 
-namespace pocketmine\command;
+namespace pocketmine\command\selectors;
 use pocketmine\command\Selectors;
 use pocketmine\Server;
 class Random extends Selectors {
@@ -39,7 +39,7 @@ class Random extends Selectors {
     @select Random player in the server
     Used when parsing the contents
     */
-    public function parse(string $content, $sender) {
+    public function parse(string $content, $sender) : string {
 		$idrand = rand(0, count($this->getServer()->getOnlinePlayers()));
 		$id = 0;
 		foreach($this->getServer()->getOnlinePlayers() as $player) {

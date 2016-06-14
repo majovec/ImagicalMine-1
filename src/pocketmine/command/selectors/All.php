@@ -30,7 +30,7 @@
  *
 */
 
-namespace pocketmine\command;
+namespace pocketmine\command\selectors;
 use pocketmine\command\Selectors;
 use pocketmine\Server;
 class All extends Selectors {
@@ -39,7 +39,7 @@ class All extends Selectors {
     @select All players of the server
     Used when parsing the contents
     */
-    public function parse(string $content, $sender) {
+    public function parse(string $content, $sender) : string {
         foreach(Server::getInstance()->getOnlinePlayers() as $player) {
             Server::getInstance()->dispatchCommand($sender, $content);
         }

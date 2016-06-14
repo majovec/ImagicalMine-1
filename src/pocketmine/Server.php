@@ -1817,9 +1817,9 @@ class Server {
 			$this->playerMetadata = new PlayerMetadataStore();
 			$this->levelMetadata = new LevelMetadataStore();
 			$this->selectors = new Selectors();
-            $this->selectors->add(new SelectorAll());
-            $this->selectors->add(new SelectorPlayer());
-            $this->selectors->add(new SelectorRand());
+            $this->selectors->add("a", new SelectorAll());
+            $this->selectors->add("p", new SelectorPlayer());
+            $this->selectors->add("r", new SelectorRand());
 
 			$this->operators = new Config($this->dataPath . "ops.txt", Config::ENUM);
 			$this->whitelist = new Config($this->dataPath . "white-list.txt", Config::ENUM);
@@ -2217,7 +2217,7 @@ class Server {
 	 * @return bool
 	 */
 	public function dispatchCommand(CommandSender $sender, $commandLine): bool{
-        $commandLine = $this->selectors->parse($commandLine);
+        $commandLine = $this->selectors->parse($commandLine, $sender);
 		if ($this->commandMap->dispatch($sender, $commandLine)) {
 			return true;
 		}

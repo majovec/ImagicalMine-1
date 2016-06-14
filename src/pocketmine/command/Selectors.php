@@ -41,9 +41,12 @@ class Selectors {
     param @content string
     */
     
-    public static function parse(string $content, $sender) : string {
-        foreach($this->selectors as $sel) {
-            $content = $sel->parse($content);
+    public function parse(string $content, $sender) : string {
+        $selectors = $this->selectors;
+        foreach($selectors as $name => $sel) {
+            if(strpos("@".$name, $content)) {
+                $content = $sel->parse($content, $sender);
+            }
         }
         return $content;
     }
@@ -51,7 +54,7 @@ class Selectors {
     With this, plugins will be able to register selectors give us the ability to add some easilier
     */
     public function add(string $selectorName, Selectors $select) {
-        $this->selectors[$selctorName] = $select;
+        $this->selectors[$selectorName] = $select;
     }
     
     
