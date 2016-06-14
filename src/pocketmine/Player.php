@@ -2249,7 +2249,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
      *
      * @param DataPacket $packet
      */
-    public function handleDataPacket(DataPacket $packet)
+    public function handleDataPacket(DataPacket $packet){
 if($this->connected === false){
 			return;
 		}
@@ -3303,7 +3303,7 @@ if($this->connected === false){
         }
         $timings->stopTiming();
     }
-
+}
 
     /**
      * Kicks a player from the server
