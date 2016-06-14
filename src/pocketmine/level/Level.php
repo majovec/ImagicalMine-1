@@ -3500,11 +3500,17 @@ class Level implements ChunkManager, Metadatable{
 	 * @param float   $y
 	 * @param float   $z
 	 */
-	public function addEntityMotion(int $chunkX, int $chunkZ, int $entityId, float $x, float $y, float $z) {
-		if (!isset($this->motionToSend[$index = Level::chunkHash($chunkX, $chunkZ)])) {
-			$this->motionToSend[$index] = [];
+	public function addEntityMotion($viewers, $entityId, $x, $y, $z){	
+		$motion = [$entityId, $x, $y, $z];
+		foreach ($viewers as $p) {
+			if(!isset($this->motionToSend[$p->getIdentifier()])){
+				$this->motionToSend[$p->getIdentifier()] = array(
+					'data' => array(),
+					'additionalChar' => $p->protocol <= Info::OLDEST_PROTOCOL ? '' : chr(0x8e)
+				);
+			}
+			$this->motionToSend[$p->getIdentifier()]['data'][] = $motion;
 		}
-		$this->motionToSend[$index][$entityId] = [$entityId, $x, $y, $z];
 	}
 
 
