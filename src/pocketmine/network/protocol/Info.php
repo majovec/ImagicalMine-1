@@ -102,5 +102,5 @@ interface Info
     const ITEM_FRAME_DROP_ITEM_PACKET = 0x3f;
     const REPLACE_SELECTED_ITEM_PACKET = 0x40;
     const ADD_ITEM_PACKET = 0x41;
-    const WRAPPER_PACKET = 0xfe
+    const WRAPPER_PACKET = 0xfe;
 }
