@@ -2295,29 +2295,6 @@ if($this->connected === false){
                 if ($len > 16 or $len < 3) {
                     $valid = false;
                 }
-                for ($i = 0; $i < $len and $valid; ++$i) {
-                    $c = ord($packet->username{$i});
-                    if (($c >= ord("a") and $c <= ord("z")) or ($c >= ord("A") and $c <= ord("Z")) or ($c >= ord("0") and $c <= ord("9")) or $c === ord("_")) {
-                        continue;
-                    }
-                    $valid = false;
-                    break;
-                }
-                if (!$valid or $this->iusername === "rcon" or $this->iusername === "console") {
-                    $this->close("", "disconnectionScreen.invalidName");
-                    break;
-                }
-                if ((strlen($packet->skin) != 64 * 64 * 4) and (strlen($packet->skin) != 64 * 32 * 4)) {
-                    $this->close("", "disconnectionScreen.invalidSkin");
-                    break;
-                    //$this->setSkin("", "Standard_Steve");
-                }
-                $this->setSkin($packet->skin, $packet->skinName);
-                $this->server->getPluginManager()->callEvent($ev = new PlayerPreLoginEvent($this, "Plugin reason"));
-                if ($ev->isCancelled()) {
-                    $this->close("", $ev->getKickMessage());
-                    break;
-                }
                 $this->onPlayerPreLogin();
                 break;
             case ProtocolInfo::MOVE_PLAYER_PACKET:
