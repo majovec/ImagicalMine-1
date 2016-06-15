@@ -3500,7 +3500,7 @@ class Level implements ChunkManager, Metadatable{
 	 * @param float   $y
 	 * @param float   $z
 	 */
-	public function addEntityMotion($viewers, $entityId, $x, $y, $z){	
+	public function addEntityMotion(array $viewers, $entityId, $x, $y, $z){	
 		$motion = [$entityId, $x, $y, $z];
 		foreach ($viewers as $p) {
 			if(!isset($this->motionToSend[$p->getIdentifier()])){

@@ -1118,10 +1118,10 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
         $timings = Timings::getSendDataPacketTimings($packet);
         $timings->startTiming();
         $this->server->getPluginManager()->callEvent($ev = new DataPacketSendEvent($this, $packet));
-        if ($ev->isCancelled()) {
+        /*if ($ev->isCancelled()) {
             $timings->stopTiming();
             return false;
-        }
+        }*/
 
         $identifier = $this->interface->putPacket($this, $packet, $needACK, true);
 
@@ -1759,7 +1759,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
     public function setMotion(Vector3 $mot): bool{
         if (parent::setMotion($mot)) {
             if ($this->chunk !== null) {
-                $this->level->addEntityMotion($this->chunk->getX(), $this->chunk->getZ(), $this->getId(), $this->motionX, $this->motionY, $this->motionZ);
+                $this->level->addEntityMotion($this->getViewers(), $this->chunk->getX(), $this->chunk->getZ(), $this->getId(), $this->motionX, $this->motionY, $this->motionZ);
                 $pk = new SetEntityMotionPacket();
                 $pk->entities[] = [0, $mot->x, $mot->y, $mot->z];
                 $this->dataPacket($pk);
@@ -3278,7 +3278,7 @@ if($this->connected === false){
             default:
                 break;
         }
-        $timings->stopTiming();
+        // Timings::$timerBatchPacket->stopTiming();
     }
 
     /**
