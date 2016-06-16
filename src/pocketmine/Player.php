@@ -2074,7 +2074,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
             }
         }
 
-	$this->setNameTag($this->username)
+	$this->setNameTag($this->username);
 	
         $nbt = $this->server->getOfflinePlayerData($this->username);
         if (!isset($nbt->NameTag)) {
