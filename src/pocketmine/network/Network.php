@@ -280,7 +280,7 @@ class Network {
 					}
 					//@todo backward compatible for 0.13 was
 					//$pk->setBuffer($buf, 1);
-					$pk->setBuffer($buf, 2); //blameshoghi
+					$pk->setBuffer($buf, 1); //blameshoghi
 
 					$pk->decode();
 					$p->handleDataPacket($pk);
@@ -355,7 +355,6 @@ class Network {
 		$this->registerPacket(ProtocolInfo::SET_TIME_PACKET, SetTimePacket::class);
 		$this->registerPacket(ProtocolInfo::START_GAME_PACKET, StartGamePacket::class);
 		$this->registerPacket(ProtocolInfo::ADD_PLAYER_PACKET, AddPlayerPacket::class);
-		$this->registerPacket(ProtocolInfo::REMOVE_PLAYER_PACKET, RemovePlayerPacket::class);
 		$this->registerPacket(ProtocolInfo::ADD_ENTITY_PACKET, AddEntityPacket::class);
 		$this->registerPacket(ProtocolInfo::REMOVE_ENTITY_PACKET, RemoveEntityPacket::class);
 		$this->registerPacket(ProtocolInfo::ADD_ITEM_ENTITY_PACKET, AddItemEntityPacket::class);
