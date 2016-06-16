@@ -24,6 +24,9 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
+ * @author ImagicalMine Team
+ * @link http://forums.imagicalmine.net/
+ *
  *
 */
 
@@ -94,9 +97,9 @@ namespace pocketmine {
 
     const VERSION = "1.5";
     const API_VERSION = "2.0.0";//API version.(plugin api version)
-    const CODENAME = "REACTIVE";
-    const MINECRAFT_VERSION = "v0.15.0 alpha";
-    const MINECRAFT_VERSION_NETWORK = "0.15.0";
+    const CODENAME = "ELITE";
+    const MINECRAFT_VERSION = "v0.14.x alpha";
+    const MINECRAFT_VERSION_NETWORK = "0.14.3";
 
     /*
      * Startup code. Do not look at it, it may harm you.

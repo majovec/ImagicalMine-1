@@ -50,9 +50,7 @@ class LoginPacket extends DataPacket
     {
         $this->username = $this->getString();
         $this->protocol1 = $this->getInt();
-        echo $this->protocol1."\n";
         $this->protocol2 = $this->getInt();
-        echo $this->protocol1;
         $this->clientId = $this->getLong();
         $this->clientUUID = $this->getUUID();
         $this->serverAddress = $this->getString();

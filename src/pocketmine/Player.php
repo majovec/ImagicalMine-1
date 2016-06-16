@@ -1118,10 +1118,10 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
         $timings = Timings::getSendDataPacketTimings($packet);
         $timings->startTiming();
         $this->server->getPluginManager()->callEvent($ev = new DataPacketSendEvent($this, $packet));
-        /*if ($ev->isCancelled()) {
+        if ($ev->isCancelled()) {
             $timings->stopTiming();
             return false;
-        }*/
+        }
 
         $identifier = $this->interface->putPacket($this, $packet, $needACK, true);
 
@@ -1759,7 +1759,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
     public function setMotion(Vector3 $mot): bool{
         if (parent::setMotion($mot)) {
             if ($this->chunk !== null) {
-                $this->level->addEntityMotion($this->getViewers(), $this->chunk->getX(), $this->chunk->getZ(), $this->getId(), $this->motionX, $this->motionY, $this->motionZ);
+                $this->level->addEntityMotion($this->chunk->getX(), $this->chunk->getZ(), $this->getId(), $this->motionX, $this->motionY, $this->motionZ);
                 $pk = new SetEntityMotionPacket();
                 $pk->entities[] = [0, $mot->x, $mot->y, $mot->z];
                 $this->dataPacket($pk);
@@ -2249,42 +2249,63 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
      *
      * @param DataPacket $packet
      */
-    public function handleDataPacket(DataPacket $packet){
-if($this->connected === false){
-			return;
-		}
-		if($packet->pid() === ProtocolInfo::BATCH_PACKET){
-			/** @var BatchPacket $packet */
-			//Timings::$timerBatchPacket->startTiming();
-			$this->server->getNetwork()->processBatch($packet, $this);
-			//Timings::$timerBatchPacket->stopTiming();
-			return;
-		}
-		$this->server->getPluginManager()->callEvent($ev = new DataPacketReceiveEvent($this, $packet));
-		if($ev->isCancelled()){
-			return;
-		}
-		switch($packet->pid()){
-			case ProtocolInfo::LOGIN_PACKET:
-				if($this->loggedIn === true){
-					break;
-				}
-				$this->username = TextFormat::clean($packet->username);
-				$this->displayName = $this->username;
-				$this->setNameTag($this->username);
-				$this->iusername = strtolower($this->username);
-					if($packet->protocol1 < ProtocolInfo::OLDEST_PROTOCOL - 1) {
-						$message = "upgrade";
-					} elseif($packet->protocol1 > ProtocolInfo::NEWEST_PROTOCOL) {
-						$message = "downgrade";
-					}
-					if(isset($message)) {
-						$pk = new PlayStatusPacket();
-						$pk->status = PlayStatusPacket::LOGIN_FAILED_CLIENT;
-						$this->dataPacket($pk);
-						$this->close("", TextFormat::RED . "Please " . $message . " to Minecraft: PE " . TextFormat::GREEN . $this->getServer()->getVersion() . TextFormat::RED . " to join.", false);
-						return;
-					}
+    public function handleDataPacket(DataPacket $packet)
+    {
+        if ($this->connected === false) {
+            return;
+        }
+
+        if ($packet::NETWORK_ID === ProtocolInfo::BATCH_PACKET) {
+            /** @var BatchPacket $packet */
+            $this->server->getNetwork()->processBatch($packet, $this);
+            return;
+        }
+
+        $timings = Timings::getReceiveDataPacketTimings($packet);
+
+        $timings->startTiming();
+
+        $this->server->getPluginManager()->callEvent($ev = new DataPacketReceiveEvent($this, $packet));
+        if ($ev->isCancelled()) {
+            $timings->stopTiming();
+            return;
+        }
+
+        switch ($packet::NETWORK_ID) {
+            case ProtocolInfo::REQUEST_CHUNK_RADIUS_PACKET:
+                $pk = new ChunkRadiusUpdatePacket();
+                $pk->radius = $this->server->chunkRadius;
+                $this->dataPacket($pk);
+                break;
+            case ProtocolInfo::PLAYER_INPUT_PACKET:
+                break;
+            case ProtocolInfo::LOGIN_PACKET:
+                if ($this->loggedIn) {
+                    break;
+                }
+                $this->username = TextFormat::clean($packet->username);
+                $this->setDisplayName($this->username);
+                $this->setNameTag($this->username);
+                $this->iusername = strtolower($this->username);
+                $this->protocol = $packet->protocol1;
+                if (count($this->server->getOnlinePlayers()) >= $this->server->getMaxPlayers() and $this->kick("disconnectionScreen.serverFull", false)) {
+                    break;
+                }
+                if (!in_array($packet->protocol1, ProtocolInfo::ACCEPTED_PROTOCOLS)) {
+                if ($packet->protocol1 < ProtocolInfo::CURRENT_PROTOCOL) {
+                $message = "disconnectionScreen.outdatedClient";
+                $pk = new PlayStatusPacket();
+                $pk->status = PlayStatusPacket::LOGIN_FAILED_CLIENT;
+                $this->directDataPacket($pk);
+                } else {
+                $message = "disconnectionScreen.outdatedServer";
+                $pk = new PlayStatusPacket();
+                $pk->status = PlayStatusPacket::LOGIN_FAILED_SERVER;
+                $this->directDataPacket($pk);
+                }
+                $this->close("", $message, false);
+                break;
+                }
                 $this->randomClientId = $packet->clientId;
                 $this->loginData = ["clientId" => $packet->clientId, "loginData" => null];
                 $this->uuid = $packet->clientUUID;
@@ -2295,6 +2316,29 @@ if($this->connected === false){
                 if ($len > 16 or $len < 3) {
                     $valid = false;
                 }
+                for ($i = 0; $i < $len and $valid; ++$i) {
+                    $c = ord($packet->username{$i});
+                    if (($c >= ord("a") and $c <= ord("z")) or ($c >= ord("A") and $c <= ord("Z")) or ($c >= ord("0") and $c <= ord("9")) or $c === ord("_")) {
+                        continue;
+                    }
+                    $valid = false;
+                    break;
+                }
+                if (!$valid or $this->iusername === "rcon" or $this->iusername === "console") {
+                    $this->close("", "disconnectionScreen.invalidName");
+                    break;
+                }
+                if ((strlen($packet->skin) != 64 * 64 * 4) and (strlen($packet->skin) != 64 * 32 * 4)) {
+                    $this->close("", "disconnectionScreen.invalidSkin");
+                    break;
+                    //$this->setSkin("", "Standard_Steve");
+                }
+                $this->setSkin($packet->skin, $packet->skinName);
+                $this->server->getPluginManager()->callEvent($ev = new PlayerPreLoginEvent($this, "Plugin reason"));
+                if ($ev->isCancelled()) {
+                    $this->close("", $ev->getKickMessage());
+                    break;
+                }
                 $this->onPlayerPreLogin();
                 break;
             case ProtocolInfo::MOVE_PLAYER_PACKET:
@@ -2304,6 +2348,13 @@ if($this->connected === false){
                     if ($entity instanceof Boat) {
                         $entity->setPosition($this->temporalVector->setComponents($packet->x, $packet->y - 0.5, $packet->z));
                     }
+                    /*
+                        if($entity instanceof Minecart){
+                            $entity->isFreeMoving = true;
+                            $entity->motionX = -sin($packet->yaw / 180 * M_PI);
+                            $entity->motionZ = cos($packet->yaw / 180 * M_PI);
+                        }
+                        */
                 }
                 $newPos = new Vector3($packet->x, $packet->y - $this->getEyeHeight(), $packet->z);
                 $revert = false;
@@ -3278,8 +3329,9 @@ if($this->connected === false){
             default:
                 break;
         }
-        // Timings::$timerBatchPacket->stopTiming();
+        $timings->stopTiming();
     }
+
 
     /**
      * Kicks a player from the server
