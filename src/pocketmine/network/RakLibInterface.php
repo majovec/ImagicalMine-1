@@ -306,8 +306,6 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface
                 if (!isset($packet->__encapsulatedPacket)) {
                     $packet->__encapsulatedPacket = new CachedEncapsulatedPacket;
                     $packet->__encapsulatedPacket->identifierACK = null;
-                    //@todo backwart compatible - on 0.13 was
-                    //$packet->__encapsulatedPacket->buffer = $packet->buffer;
                     $packet->__encapsulatedPacket->buffer = self::MAGIC_BYTE . $packet->buffer;
                     if ($packet->getChannel() !== 0) {
                         $packet->__encapsulatedPacket->reliability = 3;
@@ -362,17 +360,16 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface
      */
     private function getPacket($buffer)
     {
-        //@todo backwart compatible - on 0.13 was
-        //$pid = ord($buffer{0});
-        $pid = ord($buffer{1});
-
-        if (($data = $this->network->getPacket($pid)) === null) {
-            return null;
-        }
-        //@todo backwart compatible - on 0.13 was
-        //$data->setBuffer($buffer, 1);
-        $data->setBuffer($buffer, 2);
-
-        return $data;
+       $pid = ord($buffer{0});
+		$start = 1;
+		if($pid == 0xfe){
+			$pid = ord($buffer{1});
+			$start++;
+		}
+		if(($data = $this->network->getPacket($pid)) === null){
+			return null;
+		}
+		$data->setBuffer($buffer, $start);
+		return $data;
     }
 }
