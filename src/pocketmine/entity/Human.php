@@ -38,7 +38,7 @@ use pocketmine\item\Item as ItemItem;
 use pocketmine\utils\UUID;
 use pocketmine\nbt\NBT;
 use pocketmine\network\protocol\AddPlayerPacket;
-use pocketmine\network\protocol\RemovePlayerPacket;
+use pocketmine\network\protocol\RemoveEntityPacket;
 use pocketmine\Player;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
@@ -292,8 +292,6 @@ class Human extends Creature implements ProjectileSource, InventoryHolder
 
             $this->server->updatePlayerListData($this->getUniqueId(), $this->getId(), $this->getName(), $this->skinName, $this->skin, [$player]);
 
-            $pk = new AddPlayerPacket();
-            $pk->uuid = $this->getUniqueId();
             $pk->username = $this->getName();
             $pk->eid = $this->getId();
             $pk->x = $this->x;
@@ -324,9 +322,8 @@ class Human extends Creature implements ProjectileSource, InventoryHolder
     public function despawnFrom(Player $player)
     {
         if (isset($this->hasSpawned[$player->getLoaderId()])) {
-            $pk = new RemovePlayerPacket();
+            $pk = new RemoveEntityPacket();
             $pk->eid = $this->getId();
-            $pk->clientId = $this->getUniqueId();
             $player->dataPacket($pk);
             unset($this->hasSpawned[$player->getLoaderId()]);
         }
