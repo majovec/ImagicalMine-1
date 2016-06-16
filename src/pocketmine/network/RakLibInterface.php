@@ -295,62 +295,43 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface
      * @param unknown    $immediate (optional)
      * @return unknown
      */
-    public function putPacket(Player $player, DataPacket $packet, $needACK = false, $immediate = false)
-    {
-        if (isset($this->identifiers[$h = spl_object_hash($player)])) {
-            $identifier = $this->identifiers[$h];
-            $pk = null;
-            if (!$packet->isEncoded) {
-                $packet->encode();
-            } elseif (!$needACK) {
-                if (!isset($packet->__encapsulatedPacket)) {
-                    $packet->__encapsulatedPacket = new CachedEncapsulatedPacket;
-                    $packet->__encapsulatedPacket->identifierACK = null;
-                    $packet->__encapsulatedPacket->buffer = self::MAGIC_BYTE . $packet->buffer;
-                    if ($packet->getChannel() !== 0) {
-                        $packet->__encapsulatedPacket->reliability = 3;
-                        $packet->__encapsulatedPacket->orderChannel = $packet->getChannel();
-                        $packet->__encapsulatedPacket->orderIndex = 0;
-                    } else {
-                        $packet->__encapsulatedPacket->reliability = 2;
-                    }
-                }
-                $pk = $packet->__encapsulatedPacket;
-            }
+    	public function putPacket(Player $player, DataPacket $packet, $needACK = false, $immediate = false){
+		if(isset($this->identifiers[$h = spl_object_hash($player)])){
+			$identifier = $this->identifiers[$h];
+			$pk = null;
+			if(!$packet->isEncoded){
+				$packet->encode();
+			}elseif(!$needACK){
+				if(!isset($packet->__encapsulatedPacket)){
+					$packet->__encapsulatedPacket = new CachedEncapsulatedPacket;
+					$packet->__encapsulatedPacket->identifierACK = null;
+					$packet->__encapsulatedPacket->buffer = self::MAGIC_BYTE . $packet->buffer; // #blameshoghi
+					$packet->__encapsulatedPacket->reliability = 3;
+					$packet->__encapsulatedPacket->orderChannel = 0;
+				}
+				$pk = $packet->__encapsulatedPacket;
+			}
+			if(!$immediate and !$needACK and $packet::NETWORK_ID !== ProtocolInfo::BATCH_PACKET
+				and Network::$BATCH_THRESHOLD >= 0
+				and strlen($packet->buffer) >= Network::$BATCH_THRESHOLD){
+				$this->server->batchPackets([$player], [$packet], true);
+				return null;
+			}
+			if($pk === null){
+				$pk = new EncapsulatedPacket();
+				$pk->buffer = self::MAGIC_BYTE . $packet->buffer; // #blameshoghi
+				$packet->reliability = 3;
+				$packet->orderChannel = 0;
+				if($needACK === true){
+					$pk->identifierACK = $this->identifiersACK[$identifier]++;
+				}
+			}
+			$this->interface->sendEncapsulated($identifier, $pk, ($needACK === true ? RakLib::FLAG_NEED_ACK : 0) | ($immediate === true ? RakLib::PRIORITY_IMMEDIATE : RakLib::PRIORITY_NORMAL));
+			return $pk->identifierACK;
+		}
+		return null;
+	}
 
-            if (!$immediate and !$needACK and $packet::NETWORK_ID !== ProtocolInfo::BATCH_PACKET
-                and Network::$BATCH_THRESHOLD >= 0
-                and strlen($packet->buffer) >= Network::$BATCH_THRESHOLD) {
-                //@todo backwart compatible - on 0.13 was
-                //$this->server->batchPackets([$player], [$packet], true, $packet->getChannel());
-                $this->server->batchPackets([$player], [$packet], true);
-                return null;
-            }
-
-            if ($pk === null) {
-                $pk = new EncapsulatedPacket();
-                //@todo backwart compatible - on 0.13 was
-                //$pk->buffer = $packet->buffer;
-                $pk->buffer = self::MAGIC_BYTE . $packet->buffer;
-                if ($packet->getChannel() !== 0) {
-                    $packet->reliability = 3;
-                    $packet->orderChannel = $packet->getChannel();
-                    $packet->orderIndex = 0;
-                } else {
-                    $packet->reliability = 2;
-                }
-                if ($needACK === true) {
-                    $pk->identifierACK = $this->identifiersACK[$identifier]++;
-                }
-            }
-
-            $this->interface->sendEncapsulated($identifier, $pk, ($needACK === true ? RakLib::FLAG_NEED_ACK : 0) | ($immediate === true ? RakLib::PRIORITY_IMMEDIATE : RakLib::PRIORITY_NORMAL));
-
-            return $pk->identifierACK;
-        }
-
-        return null;
-    }
 
 
     /**
