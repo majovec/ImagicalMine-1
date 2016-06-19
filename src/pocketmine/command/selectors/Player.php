@@ -51,6 +51,8 @@ class Player extends Selectors {
                     }
 				}
 			}
+        } else {
+            $content = str_ireplace("@p ", "CONSOLE ", $content);
         }
         return $content;
     }

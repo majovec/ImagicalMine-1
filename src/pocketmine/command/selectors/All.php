@@ -40,9 +40,13 @@ class All extends Selectors {
     Used when parsing the contents
     */
     public function parse(string $content, $sender) : string {
-        foreach(Server::getInstance()->getOnlinePlayers() as $player) {
-            Server::getInstance()->dispatchCommand($sender, $content);
+        if(strpos($content, "@a")) {
+            foreach(Server::getInstance()->getOnlinePlayers() as $player) {
+                Server::getInstance()->dispatchCommand($sender, $content);
+            }
+            return "";
+        } else {
+            return $content;
         }
-        return null;
     }
 }

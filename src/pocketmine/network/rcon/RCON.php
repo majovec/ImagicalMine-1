@@ -98,7 +98,10 @@ class RCON
                 } else {
                     $response = new RemoteConsoleCommandSender();
                     $command = $this->workers[$n]->cmd;
-
+                    
+                    $command = $this->server->getSelectors()->parse($command, $sender); // parsing things
+                    
+                    
                     $this->server->getPluginManager()->callEvent($ev = new RemoteServerCommandEvent($response, $command));
 
                     if (!$ev->isCancelled()) {

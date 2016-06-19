@@ -2197,6 +2197,7 @@ class Server {
 	public function checkConsole() {
 		Timings::$serverCommandTimer->startTiming();
 		if (($line = $this->console->getLine()) !== null) {
+            // $line = $this->getSelectors()->parse($line, $this->consoleSender); // parsing things
 			$this->pluginManager->callEvent($ev = new ServerCommandEvent($this->consoleSender, $line));
 			if (!$ev->isCancelled()) {
 				$this->dispatchCommand($ev->getSender(), $ev->getCommand());

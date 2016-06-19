@@ -44,9 +44,7 @@ class Selectors {
     public function parse(string $content, $sender) : string {
         $selectors = $this->selectors;
         foreach($selectors as $name => $sel) {
-            if(strpos("@".$name, $content)) {
-                $content = $sel->parse($content, $sender);
-            }
+            $content = $sel->parse($content, $sender);
         }
         return $content;
     }

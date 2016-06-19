@@ -40,13 +40,14 @@ class Random extends Selectors {
     Used when parsing the contents
     */
     public function parse(string $content, $sender) : string {
-		$idrand = rand(0, count($this->getServer()->getOnlinePlayers()));
+		$idrand = rand(0, count(Server::getInstance()->getOnlinePlayers()));
 		$id = 0;
-		foreach($this->getServer()->getOnlinePlayers() as $player) {
+		foreach(Server::getInstance()->getOnlinePlayers() as $player) {
 			if($id === $idrand) {
 				$content = str_ireplace("@r ", $player->getName() . " ", $content);
 			}
 			$id++;
 		}
+        return $content;
     }
 }
