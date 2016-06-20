@@ -54,26 +54,23 @@ class AddEntityPacket extends DataPacket
     {
     }
 
-    public function encode()
-    {
-        $this->reset();
-        $this->putLong($this->eid);
-        $this->putInt($this->type);
-        $this->putFloat($this->x);
-        $this->putFloat($this->y);
-        $this->putFloat($this->z);
-        $this->putFloat($this->speedX);
-        $this->putFloat($this->speedY);
-        $this->putFloat($this->speedZ);
-        $this->putFloat($this->yaw);
-        $this->putFloat($this->pitch);
-        $meta = Binary::writeMetadata($this->metadata);
-        $this->put($meta);
-        $this->putShort(count($this->links));
-        foreach ($this->links as $link) {
-            $this->putLong($link[0]);
-            $this->putLong($link[1]);
-            $this->putByte($link[2]);
-        }
-    }
-}
+    public function encode(){
+ 		$this->reset();
+ 		$this->putLong($this->eid);
+ 		$this->putInt($this->type);
+ 		$this->putFloat($this->x);
+ 		$this->putFloat($this->y);
+ 		$this->putFloat($this->z);
+  		$this->putFloat($this->speedX);
+  		$this->putFloat($this->speedY);
+  		$this->putFloat($this->speedZ);
+ 		$this->putFloat($this->yaw);
+ 		$this->putFloat($this->pitch);
+  		$this->putShort(0);
+  		if(!empty($this->metadata)) {
+  			$meta = Binary::writeMetadata($this->metadata);
+ 			$this->put($meta);
+ 		}
+ 		$this->putShort(0);
+ 	}
+ }
