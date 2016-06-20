@@ -98,6 +98,7 @@ use pocketmine\network\protocol\TextPacket;
 use pocketmine\network\protocol\MovePlayerPacket;
 use pocketmine\network\protocol\SetDifficultyPacket;
 use pocketmine\network\protocol\SetEntityMotionPacket;
+use pocketmine\network\protocol\SetEntityDataPacket;
 use pocketmine\network\protocol\SetSpawnPositionPacket;
 use pocketmine\network\protocol\SetTimePacket;
 use pocketmine\network\protocol\StartGamePacket;
@@ -2242,6 +2243,13 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
         foreach ($sendPacket as $pk) {
             $this->dataPacket($pk);
         }
+    				$this->server->sendFullPlayerListData($this);
+  				$this->server->sendRecipeList($this);
+    				$pk = new SetEntityDataPacket();
+ 				$pk->eid = 0;
+ 				$pk->metadata = [self::DATA_LEAD_HOLDER => [self::DATA_TYPE_LONG, -1]];
+ 				$this->dataPacket($pk);
+    	
     }
 
 
