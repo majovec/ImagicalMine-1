@@ -157,7 +157,7 @@ class ConsoleCommandSender implements CommandSender
             
             
             case stristr(PHP_OS, "LINUX"): // Linux
-            exec('dialog --title "' . $title . '"  --nok--cancel-label "Ok" --msgbox "' . $message . '" off 2> $FICHTMP');
+            exec('dialog --title "' . $title . '"  --nook--cancel-label "Ok" --msgbox "' . $message . '" off 2> $FICHTMP');
             break;
         }
     }
