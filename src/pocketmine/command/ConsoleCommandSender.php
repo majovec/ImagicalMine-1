@@ -116,8 +116,51 @@ class ConsoleCommandSender implements CommandSender
     {
         return $this->perm->getEffectivePermissions();
     }
-
-
+    
+    
+    
+    public function sendPopup(string $message, $title = null) { // This will send an notify to the person
+    switch(true) {
+            
+            
+            
+            case stristr(PHP_OS, 'DAR'): // Mac
+            exec('osascript -e \'display notification "' . $message . '" with title "' . $title . '"\'');
+            exec('osascript -e \'beep\'');
+            break;
+            
+            
+            case stristr(PHP_OS, 'WIN'): // Windows
+            exec("cscript MessageBox.vbs {$message}");
+            break;
+            
+            
+            case stristr(PHP_OS, "LINUX"): // Linux
+            exec('notify-send "' . $message . '"');
+            break;
+        }
+    }
+    
+    public function sendTip(string $message, $title = null, array $buttons = ["Close"] /*For MACOSX and Linux*/) { // This will send an alert to the owner
+        switch(true) {
+            
+            
+            
+            case stristr(PHP_OS, 'DAR'): // Mac
+            exec('osascript -e \'display dialog "' . $message . '" with icon note buttons {"' . implode('", "', $buttons) . '"} default button {"' . $buttons[0] . '"}\'');
+            break;
+            
+            
+            case stristr(PHP_OS, 'WIN'): // Windows
+            exec("mshta javascript:alert('{$message}');window.close();");
+            break;
+            
+            
+            case stristr(PHP_OS, "LINUX"): // Linux
+            exec('dialog --title "' . $title . '"  --nok--cancel-label "Ok" --msgbox "' . $message . '" off 2> $FICHTMP');
+            break;
+        }
+    }
     /**
      *
      * @return bool
