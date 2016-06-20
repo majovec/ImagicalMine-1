@@ -94,3 +94,4 @@ abstract class DataPacket extends BinaryStream
 		}
 		return $data;
 	}
+}
