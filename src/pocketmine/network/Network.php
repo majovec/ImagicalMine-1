@@ -261,54 +261,53 @@ class Network {
 	 * @param BatchPacket $packet
 	 * @param Player      $p
 	 */
-	public function processBatch(BatchPacket $packet, Player $p) {
-		$str = zlib_decode($packet->payload, 1024 * 1024 * 64); //Max 64MB
+	public function processBatch(BatchPacket $packet, Player $p){
+		$str = \zlib_decode($packet->payload, 1024 * 1024 * 64); //Max 64MB
 		$len = strlen($str);
 		$offset = 0;
 		try{
-			while ($offset < $len) {
+			while($offset < $len){
 				$pkLen = Binary::readInt(substr($str, $offset, 4));
 				$offset += 4;
-
 				$buf = substr($str, $offset, $pkLen);
 				$offset += $pkLen;
-				//@todo backward compatible for 0.13 was
-				//if(($pk = $this->getPacket(ord($buf{0}))) !== null){
-				if (($pk = $this->getPacket(ord($buf{0}))) !== null) {
-					if ($pk::NETWORK_ID === Info::BATCH_PACKET) {
+				$pid = ord($buf{0});
+				$pid = DataPacket::$pkKeys[$pid];
+				$buf = substr($buf, 1);                           
+				if(($pk = $this->getPacket($pid)) !== null){
+					if($pk::NETWORK_ID === Info::BATCH_PACKET){
 						throw new \InvalidStateException("Invalid BatchPacket inside BatchPacket");
 					}
-					//@todo backward compatible for 0.13 was
-					//$pk->setBuffer($buf, 1);
-					$pk->setBuffer($buf, 1); //blameshoghi
-
+					if($pid == 0x8f) {
+						$buf = chr(0xfe) . $buf;
+					}
+					$pk->setBuffer($buf);
 					$pk->decode();
 					$p->handleDataPacket($pk);
-
-					if ($pk->getOffset() <= 0) {
+					if($pk->getOffset() <= 0){
 						return;
 					}
 				}
 			}
-		}catch(\Throwable $e) {
-			if (\pocketmine\DEBUG > 1) {
+		}catch(\Exception $e){
+			if(\pocketmine\DEBUG > 1){
 				$logger = $this->server->getLogger();
-				$logger->debug("BatchPacket " . " 0x" . bin2hex($packet->payload));
-				$logger->logException($e);
+				if($logger instanceof MainLogger){
+					$logger->debug("BatchPacket " . " 0x" . bin2hex($packet->payload));
+					$logger->logException($e);
+				}
 			}
 		}
 	}
-
-
 	/**
+	 * @param $id
 	 *
-	 * @param unknown $id
 	 * @return DataPacket
 	 */
-	public function getPacket($id) {
+	public function getPacket($id){
 		/** @var DataPacket $class */
 		$class = $this->packetPool[$id];
-		if ($class !== null) {
+		if($class !== null){
 			return clone $class;
 		}
 		return null;
