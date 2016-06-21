@@ -4,7 +4,7 @@
 [![Travis Build](https://travis-ci.org/Inactive-to-Reactive/ImagicalMine.svg)](https://travis-ci.org/Inactive-to-Reactive/ImagicalMine) <br>
 IN DEV: [![Build status](https://ci.appveyor.com/api/projects/status/vyarr1tt50639w0f/branch/master?svg=true)](https://ci.appveyor.com/project/remotevase/imagicalmine/branch/master) <br>
  __[Working **temporary** jenkins server!](http://jenkins.terweij.nl/job/ImagicalMine/)__ <br>
-Another download link is on our [wiki download server.](https://github.com/Inactive-to-Reactive/ImagicalMine/wiki/lateststablebuild.ci.inactivetoreactive.net)
+Another download link is on our [wiki download server.](https://github.com/Inactive-to-Reactive/ImagicalMine/wiki/ImagicalMine-0.15-Phar-Files!)
 <br>
 
 
