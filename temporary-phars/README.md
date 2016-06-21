@@ -1,4 +1,4 @@
-# New Plar Download System
+# New Phar Download System
 
 ## Each day that there are new commits, remotevase will attempt to upload a new server phar file!
 
