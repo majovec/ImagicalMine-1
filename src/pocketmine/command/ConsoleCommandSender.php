@@ -152,6 +152,7 @@ class ConsoleCommandSender implements CommandSender
             
             
             case stristr(PHP_OS, 'WIN'): // Windows
+            $message = htmlspecialchars($message);
             exec("mshta javascript:alert('{$message}');window.close();");
             break;
             
