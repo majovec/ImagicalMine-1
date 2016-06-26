@@ -110,7 +110,7 @@ class TitleCommand extends VanillaCommand
                 Command::broadcastCommandMessage($sender, new TranslationContainer("%commands.title.success", [$player, implode(" ", $args)]));
                 break;
                 default:
-                $sender->sendMessage(new TranslationContainer("%commands.title.notvalidtype", [$player, $type]))
+                $sender->sendMessage(new TranslationContainer("%commands.title.notvalidtype", [$player, $type]));
                 break;
             }
         } else {
