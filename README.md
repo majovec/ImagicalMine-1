@@ -3,8 +3,8 @@
 
 [![Travis Build](https://travis-ci.org/Inactive-to-Reactive/ImagicalMine.svg)](https://travis-ci.org/Inactive-to-Reactive/ImagicalMine) <br>
 IN DEV: [![Build status](https://ci.appveyor.com/api/projects/status/vyarr1tt50639w0f/branch/master?svg=true)](https://ci.appveyor.com/project/remotevase/imagicalmine/branch/master) <br>
- __[The former (and current if he wishes) owner of ImagicalMine has been kind enough to make us a Jenkins server. Please read the description of our portion! Thanks!](https://hub.imagicalmine.net/job/ImagicalMine)__  (Jenkins is down Right Now)<br>
-Another download link is on our [wiki download server.](https://github.com/Inactive-to-Reactive/ImagicalMine/wiki/lateststablebuild.ci.inactivetoreactive.net)
+ __[Working **temporary** jenkins server!](http://jenkins.terweij.nl/job/ImagicalMine/)__ <br>
+Another download link is on our [wiki download server.](https://github.com/Inactive-to-Reactive/ImagicalMine/wiki/ImagicalMine-0.15-Phar-Files!)
 <br>
 
 
