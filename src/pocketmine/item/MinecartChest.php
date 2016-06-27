@@ -9,12 +9,12 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\DoubleTag;
 use pocketmine\nbt\tag\FloatTag;
-use pocketmine\entity\Minecart as MinecartEntity;
+use pocketmine\entity\MinecartChest as MinecartChestEntity;
 
-class Minecart extends Item{
+class MinecartChest extends Item{
 
 	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::MINECART, $meta, $count, "Minecart");
+		parent::__construct(self::CHEST_MINECART, $meta, $count, "Chest Minecart");
 	}
 	
 	public function getMaxStackSize(){
@@ -28,7 +28,7 @@ class Minecart extends Item{
 	public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		if(!in_array($target->getId(),array(Block::RAIL, Block::ACTIVATOR_RAIL, Block::DETECTOR_RAIL, Block::POWERED_RAIL))) return false;
 		$realPos = $target->add(0.5, 0, 0.5);
-		$cart = new MinecartEntity($player->getLevel()->getChunk($realPos->getX() >> 4, $realPos->getZ() >> 4), new CompoundTag("", [
+		$cart = new MinecartChestEntity($player->getLevel()->getChunk($realPos->getX() >> 4, $realPos->getZ() >> 4), new CompoundTag("", [
 			"Pos" => new ListTag("Pos", [
 				new DoubleTag("", $realPos->getX()),
 				new DoubleTag("", $realPos->getY()),
