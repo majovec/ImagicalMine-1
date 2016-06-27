@@ -63,7 +63,7 @@ class SetBlockCommand extends VanillaCommand{
 			$z = $args[2];
 			if(Item::fromString($args[3]) instanceof ItemBlock){
 				$level->setBlock(new Vector3($x, $y, $z), new Block(Item::fromString($args[3])->getId(), Item::fromString($args[3])->getDamage()));
-				Command::broadcastCommandMessage($sender, new TranslationContainer("%commands.setblock.success", [$x, $y, $z, $block]));
+				Command::broadcastCommandMessage($sender, new TranslationContainer("%commands.setblock.success", [$x, $y, $z, Item::fromString($args[3])->getName()]));
 			}
 		}
 	}

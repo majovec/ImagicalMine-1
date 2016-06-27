@@ -2386,10 +2386,14 @@ class Server {
 			pcntl_signal(SIGHUP, [$this, "handleSignal"]);
 			$this->dispatchSignals = true;
 		}
-
+        
+        
 		$this->logger->info($this->getLanguage()->translateString("pocketmine.server.defaultGameMode", [self::getGamemodeString($this->getGamemode())]));
 
 		$this->logger->info($this->getLanguage()->translateString("pocketmine.server.startFinished", [round(microtime(true) - \pocketmine\START_TIME, 3)]));
+        
+        $output = (new \pocketmine\utils\notifier\Notification("Server is now running..."))->error;
+        echo $output;
 
 		$this->tickProcessor();
 		$this->forceShutdown();
