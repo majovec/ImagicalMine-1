@@ -1,35 +1,4 @@
 <?php
-/**
- * src/pocketmine/entity/Living.php
- *
- * @package default
- */
-
-
-/*
- *
- *  _                       _           _ __  __ _
- * (_)                     (_)         | |  \/  (_)
- *  _ _ __ ___   __ _  __ _ _  ___ __ _| | \  / |_ _ __   ___
- * | | '_ ` _ \ / _` |/ _` | |/ __/ _` | | |\/| | | '_ \ / _ \
- * | | | | | | | (_| | (_| | | (_| (_| | | |  | | | | | |  __/
- * |_|_| |_| |_|\__,_|\__, |_|\___\__,_|_|_|  |_|_|_| |_|\___|
- *                     __/ |
- *                    |___/
- *
- * This program is a third party build by ImagicalMine.
- *
- * PocketMine is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * @author ImagicalMine Team
- * @link http://forums.imagicalcorp.ml/
- *
- *
-*/
-
 namespace pocketmine\entity;
 
 use pocketmine\block\Block;
@@ -46,319 +15,284 @@ use pocketmine\network\protocol\EntityEventPacket;
 use pocketmine\Server;
 use pocketmine\utils\BlockIterator;
 
-abstract class Living extends Entity implements Damageable
-{
+abstract class Living extends Entity implements Damageable{
 
-    protected $gravity = 0.08;
-    protected $drag = 0.02;
+	protected $gravity = 0.08;
+	protected $drag = 0.02;
 
-    protected $attackTime = 0;
+	protected $attackTime = 0;
 
-    protected $invisible = false;
+	protected $invisible = false;
+	
+	protected $exp_min = 0;
+	protected $exp_max = 0;
 
-    /**
-     *
-     */
-    protected function initEntity()
-    {
-        parent::initEntity();
+	protected function initEntity(){
+		parent::initEntity();
 
-        if (isset($this->namedtag->HealF)) {
-            $this->namedtag->Health = new ShortTag("Health", (int) $this->namedtag["HealF"]);
-            unset($this->namedtag->HealF);
-        }
+		if(isset($this->namedtag->HealF)){
+			$this->namedtag->Health = new ShortTag("Health", (int) $this->namedtag["HealF"]);
+			unset($this->namedtag->HealF);
+		}elseif(!isset($this->namedtag->Health) or !($this->namedtag->Health instanceof ShortTag)){
+			$this->namedtag->Health = new ShortTag("Health", $this->getMaxHealth());
+		}
 
-        if (!isset($this->namedtag->Health) or !($this->namedtag->Health instanceof ShortTag)) {
-            $this->namedtag->Health = new ShortTag("Health", $this->getMaxHealth());
-        }
+		$this->setHealth($this->namedtag["Health"]);
+	}
 
-        $this->setHealth($this->namedtag["Health"]);
-    }
+	protected function addAttributes(){
+		if(is_null($this->attributeMap->getAttribute(Attribute::HEALTH))) $this->attributeMap->addAttribute(Attribute::getAttribute(Attribute::HEALTH));
+		if(is_null($this->attributeMap->getAttribute(Attribute::FOLLOW_RANGE))) $this->attributeMap->addAttribute(Attribute::getAttribute(Attribute::FOLLOW_RANGE));
+		if(is_null($this->attributeMap->getAttribute(Attribute::KNOCKBACK_RESISTANCE))) $this->attributeMap->addAttribute(Attribute::getAttribute(Attribute::KNOCKBACK_RESISTANCE));
+		if(is_null($this->attributeMap->getAttribute(Attribute::MOVEMENT_SPEED))) $this->attributeMap->addAttribute(Attribute::getAttribute(Attribute::MOVEMENT_SPEED));
+		if(is_null($this->attributeMap->getAttribute(Attribute::ATTACK_DAMAGE))) $this->attributeMap->addAttribute(Attribute::getAttribute(Attribute::ATTACK_DAMAGE));
+		if(is_null($this->attributeMap->getAttribute(Attribute::ABSORPTION))) $this->attributeMap->addAttribute(Attribute::getAttribute(Attribute::ABSORPTION));
+	}
 
+	public function setHealth($amount){
+		$wasAlive = $this->isAlive();
+		parent::setHealth($amount);
+		$this->attributeMap->getAttribute(Attribute::HEALTH)->setValue($this->getHealth());
+		if($this->isAlive() and !$wasAlive){
+			$pk = new EntityEventPacket();
+			$pk->eid = $this->getId();
+			$pk->event = EntityEventPacket::RESPAWN;
+			Server::broadcastPacket($this->hasSpawned, $pk);
+		}
+	}
 
-    /**
-     *
-     * @param unknown $amount
-     */
-    public function setHealth($amount)
-    {
-        $wasAlive = $this->isAlive();
-        parent::setHealth($amount);
-        if ($this->isAlive() and !$wasAlive) {
-            $pk = new EntityEventPacket();
-            $pk->eid = $this->getId();
-            $pk->event = EntityEventPacket::RESPAWN;
-            Server::broadcastPacket($this->hasSpawned, $pk);
-        }
-    }
+	public function setMaxHealth($amount){
+		if(is_null($this->attributeMap->getAttribute(Attribute::HEALTH))) $this->attributeMap->addAttribute(Attribute::getAttribute(Attribute::HEALTH));
+		$this->attributeMap->getAttribute(Attribute::HEALTH)->setMaxValue($amount);
+	}
 
+	public function saveNBT(){
+		parent::saveNBT();
+		$this->namedtag->Health = new ShortTag("Health", $this->getHealth());
+	}
 
-    /**
-     *
-     */
-    public function saveNBT()
-    {
-        parent::saveNBT();
-        $this->namedtag->Health = new ShortTag("Health", $this->getHealth());
-    }
+	public function hasLineOfSight(Entity $entity){
+		//TODO: head height
+		return true;
+		//return $this->getLevel()->rayTraceBlocks(Vector3::createVector($this->x, $this->y + $this->height, $this->z), Vector3::createVector($entity->x, $entity->y + $entity->height, $entity->z)) === null;
+	}
 
+	public function heal($amount, EntityRegainHealthEvent $source){
+		parent::heal($amount, $source);
+		if($source->isCancelled()){
+			return;
+		}
 
-    /**
-     *
-     * @param Entity  $entity
-     * @return unknown
-     */
-    public function hasLineOfSight(Entity $entity)
-    {
-        //TODO: head height
-        return true;
-        //return $this->getLevel()->rayTraceBlocks(Vector3::createVector($this->x, $this->y + $this->height, $this->z), Vector3::createVector($entity->x, $entity->y + $entity->height, $entity->z)) === null;
-    }
+		$this->attackTime = 0;
+	}
 
+	public function attack($damage, EntityDamageEvent $source){
+		if($this->attackTime > 0 or $this->noDamageTicks > 0){
+			$lastCause = $this->getLastDamageCause();
+			if($lastCause !== null and $lastCause->getDamage() >= $damage){
+				$source->setCancelled();
+			}
+		}
 
-    /**
-     *
-     * @param unknown                 $amount
-     * @param EntityRegainHealthEvent $source
-     */
-    public function heal($amount, EntityRegainHealthEvent $source)
-    {
-        parent::heal($amount, $source);
-        if ($source->isCancelled()) {
-            return;
-        }
+		parent::attack($damage, $source);
 
-        $this->attackTime = 0;
-    }
+		if($source->isCancelled()){
+			return;
+		}
 
+		if($source instanceof EntityDamageByEntityEvent){
+			$e = $source->getDamager();
+			if($source instanceof EntityDamageByChildEntityEvent){
+				$e = $source->getChild();
+			}
 
-    /**
-     *
-     * @param unknown           $damage
-     * @param EntityDamageEvent $source
-     */
-    public function attack($damage, EntityDamageEvent $source)
-    {
-        if ($this->attackTime > 0 or $this->noDamageTicks > 0) {
-            $lastCause = $this->getLastDamageCause();
-            if ($lastCause !== null and $lastCause->getDamage() >= $damage) {
-                $source->setCancelled();
-            }
-        }
+			if($e->isOnFire() > 0){
+				$this->setOnFire(2 * $this->server->getDifficulty());
+			}
 
-        parent::attack($source->getFinalDamage(), $source);
+			$deltaX = $this->x - $e->x;
+			$deltaZ = $this->z - $e->z;
+			$this->knockBack($e, $damage, $deltaX, $deltaZ, $source->getKnockBack());
+		}
 
-        if ($source->isCancelled()) {
-            return;
-        }
+		$pk = new EntityEventPacket();
+		$pk->eid = $this->getId();
+		$pk->event = $this->getHealth() <= 0 ? EntityEventPacket::DEATH_ANIMATION : EntityEventPacket::HURT_ANIMATION; //Ouch!
+		Server::broadcastPacket($this->hasSpawned, $pk);
 
-        if ($source instanceof EntityDamageByEntityEvent) {
-            $e = $source->getDamager();
-            if ($source instanceof EntityDamageByChildEntityEvent) {
-                $e = $source->getChild();
-            }
+		$this->attackTime = 10; //0.5 seconds cooldown
+	}
 
-            if ($e->isOnFire() > 0) {
-                $this->setOnFire(2 * $this->server->getDifficulty());
-            }
+	public function knockBack(Entity $attacker, $damage, $x, $z, $base = 0.4){
+		$f = sqrt($x * $x + $z * $z);
+		if($f <= 0){
+			return;
+		}
 
-            $deltaX = $this->x - $e->x;
-            $deltaZ = $this->z - $e->z;
-            $this->knockBack($e, $damage, $deltaX, $deltaZ, $source->getKnockBack());
-        }
-        $pk = new EntityEventPacket();
-        $pk->eid = $this->getId();
-        $pk->event = $this->getHealth() <= 0?EntityEventPacket::DEATH_ANIMATION:EntityEventPacket::HURT_ANIMATION; // Ouch!
-        Server::broadcastPacket($this->hasSpawned, $pk);
+		$f = 1 / $f;
 
-        $this->attackTime = 10; //0.5 seconds cooldown
-    }
+		$motion = new Vector3($this->motionX, $this->motionY, $this->motionZ);
 
+		$motion->x /= 2;
+		$motion->y /= 2;
+		$motion->z /= 2;
+		$motion->x += $x * $f * $base;
+		$motion->y += $base;
+		$motion->z += $z * $f * $base;
 
-    /**
-     *
-     * @param Entity  $attacker
-     * @param unknown $damage
-     * @param unknown $x
-     * @param unknown $z
-     * @param unknown $base     (optional)
-     */
-    public function knockBack(Entity $attacker, $damage, $x, $z, $base = 0.4)
-    {
-        $f = sqrt($x * $x + $z * $z);
-        if ($f <= 0) {
-            return;
-        }
+		if($motion->y > $base){
+			$motion->y = $base;
+		}
 
-        $f = 1 / $f;
+		$this->setMotion($motion);
+	}
+	
+	public function getExperience(){
+		if($this->exp_max > 0){
+			return mt_rand($this->exp_min,$this->exp_max);
+		}
+		return 0;
+	}
+	
+	public function kill(){
+		if(!$this->isAlive()){
+			return;
+		}
+		parent::kill();
+		$this->server->getPluginManager()->callEvent($ev = new EntityDeathEvent($this, $this->getDrops()));
+		foreach($ev->getDrops() as $item){
+			$this->getLevel()->dropItem($this, $item);
+		}
+		if($this->server->getProperty("player.experience.enable", true)
+		and $this->server->getProperty("experience.mob-drop", true)){
+			$DropExp = $this->getExperience();
+			$vector = new Vector3(ceil($this->x),ceil($this->y),ceil($this->z));
+			$this->getLevel()->spawnExperienceOrb($vector,$DropExp);
+		}
+	}
 
-        $motion = new Vector3($this->motionX, $this->motionY, $this->motionZ);
+	public function entityBaseTick($tickDiff = 1){
+		Timings::$timerLivingEntityBaseTick->startTiming();
 
-        $motion->x /= 2;
-        $motion->y /= 2;
-        $motion->z /= 2;
-        $motion->x += $x * $f * $base;
-        $motion->y += $base;
-        $motion->z += $z * $f * $base;
+		$hasUpdate = parent::entityBaseTick($tickDiff);
 
-        if ($motion->y > $base) {
-            $motion->y = $base;
-        }
+		if($this->isAlive()){
+			if($this->isInsideOfSolid()){
+				$hasUpdate = true;
+				$ev = new EntityDamageEvent($this, EntityDamageEvent::CAUSE_SUFFOCATION, 1);
+				$this->attack($ev->getFinalDamage(), $ev);
+			}
 
-        $this->setMotion($motion);
-    }
+			if(!$this->hasEffect(Effect::WATER_BREATHING) and $this->isInsideOfWater()){
+				if($this instanceof WaterAnimal){
+					$this->setDataProperty(self::DATA_AIR, self::DATA_TYPE_SHORT, 300);
+				}else{
+					$hasUpdate = true;
+					$airTicks = $this->getDataProperty(self::DATA_AIR) - $tickDiff;
+					if($airTicks <= -20){
+						$airTicks = 0;
 
+						$ev = new EntityDamageEvent($this, EntityDamageEvent::CAUSE_DROWNING, 2);
+						$this->attack($ev->getFinalDamage(), $ev);
+					}
+					$this->setDataProperty(self::DATA_AIR, self::DATA_TYPE_SHORT, $airTicks);
+				}
+			}else{
+				if($this instanceof WaterAnimal){
+					$hasUpdate = true;
+					$airTicks = $this->getDataProperty(self::DATA_AIR) - $tickDiff;
+					if($airTicks <= -20){
+						$airTicks = 0;
 
-    /**
-     *
-     */
-    public function kill()
-    {
-        if (!$this->isAlive()) {
-            return;
-        }
-        parent::kill();
-        $this->server->getPluginManager()->callEvent($ev = new EntityDeathEvent($this, $this->getDrops()));
-        foreach ($ev->getDrops() as $item) {
-            $this->getLevel()->dropItem($this, $item);
-        }
-    }
+						$ev = new EntityDamageEvent($this, EntityDamageEvent::CAUSE_SUFFOCATION, 2);
+						$this->attack($ev->getFinalDamage(), $ev);
+					}
+					$this->setDataProperty(self::DATA_AIR, self::DATA_TYPE_SHORT, $airTicks);
+				}else{
+					$this->setDataProperty(self::DATA_AIR, self::DATA_TYPE_SHORT, 300);
+				}
+			}
+		}
 
+		if($this->attackTime > 0){
+			$this->attackTime -= $tickDiff;
+		}
 
-    /**
-     *
-     * @param unknown $tickDiff (optional)
-     * @return unknown
-     */
-    public function entityBaseTick($tickDiff = 1)
-    {
-        Timings::$timerLivingEntityBaseTick->startTiming();
+		Timings::$timerLivingEntityBaseTick->stopTiming();
 
-        $hasUpdate = parent::entityBaseTick($tickDiff);
+		return $hasUpdate;
+	}
 
-        if ($this->isAlive()) {
-            if ($this->isInsideOfSolid()) {
-                $hasUpdate = true;
-                $ev = new EntityDamageEvent($this, EntityDamageEvent::CAUSE_SUFFOCATION, 1);
-                $this->attack($ev->getFinalDamage(), $ev);
-            }
+	/**
+	 * @return ItemItem[]
+	 */
+	public function getDrops(){
+		return [];
+	}
 
-            if (!$this->hasEffect(Effect::WATER_BREATHING) and $this->isInsideOfWater()) {
-                if ($this instanceof WaterAnimal) {
-                    $this->setDataProperty(self::DATA_AIR, self::DATA_TYPE_SHORT, 300);
-                } else {
-                    $hasUpdate = true;
-                    $airTicks = $this->getDataProperty(self::DATA_AIR) - $tickDiff;
-                    if ($airTicks <= -20) {
-                        $airTicks = 0;
+	/**
+	 * @param int   $maxDistance
+	 * @param int   $maxLength
+	 * @param array $transparent
+	 *
+	 * @return Block[]
+	 */
+	public function getLineOfSight($maxDistance, $maxLength = 0, array $transparent = []){
+		if($maxDistance > 120){
+			$maxDistance = 120;
+		}
 
-                        $ev = new EntityDamageEvent($this, EntityDamageEvent::CAUSE_DROWNING, 2);
-                        $this->attack($ev->getFinalDamage(), $ev);
-                    }
-                    $this->setDataProperty(self::DATA_AIR, self::DATA_TYPE_SHORT, $airTicks);
-                }
-            } else {
-                if ($this instanceof WaterAnimal) {
-                    $hasUpdate = true;
-                    $airTicks = $this->getDataProperty(self::DATA_AIR) - $tickDiff;
-                    if ($airTicks <= -20) {
-                        $airTicks = 0;
+		if(count($transparent) === 0){
+			$transparent = null;
+		}
 
-                        $ev = new EntityDamageEvent($this, EntityDamageEvent::CAUSE_SUFFOCATION, 2);
-                        $this->attack($ev->getFinalDamage(), $ev);
-                    }
-                    $this->setDataProperty(self::DATA_AIR, self::DATA_TYPE_SHORT, $airTicks);
-                } else {
-                    $this->setDataProperty(self::DATA_AIR, self::DATA_TYPE_SHORT, 300);
-                }
-            }
-        }
+		$blocks = [];
+		$nextIndex = 0;
 
-        if ($this->attackTime > 0) {
-            $this->attackTime -= $tickDiff;
-        }
+		$itr = new BlockIterator($this->level, $this->getPosition(), $this->getDirectionVector(), $this->getEyeHeight(), $maxDistance);
 
-        Timings::$timerLivingEntityBaseTick->stopTiming();
+		while($itr->valid()){
+			$itr->next();
+			$block = $itr->current();
+			$blocks[$nextIndex++] = $block;
 
-        return $hasUpdate;
-    }
+			if($maxLength !== 0 and count($blocks) > $maxLength){
+				array_shift($blocks);
+				--$nextIndex;
+			}
 
+			$id = $block->getId();
 
-    /**
-     *
-     * @return ItemItem[]
-     */
-    public function getDrops()
-    {
-        return [];
-    }
+			if($transparent === null){
+				if($id !== 0){
+					break;
+				}
+			}else{
+				if(!isset($transparent[$id])){
+					break;
+				}
+			}
+		}
 
+		return $blocks;
+	}
 
-    /**
-     *
-     * @param int     $maxDistance
-     * @param int     $maxLength   (optional)
-     * @param array   $transparent (optional)
-     * @return Block[]
-     */
-    public function getLineOfSight($maxDistance, $maxLength = 0, array $transparent = [])
-    {
-        if ($maxDistance > 120) {
-            $maxDistance = 120;
-        }
+	/**
+	 * @param int   $maxDistance
+	 * @param array $transparent
+	 *
+	 * @return Block
+	 */
+	public function getTargetBlock($maxDistance, array $transparent = []){
+		try{
+			$block = $this->getLineOfSight($maxDistance, 1, $transparent)[0];
+			if($block instanceof Block){
+				return $block;
+			}
+		}catch (\ArrayOutOfBoundsException $e){
 
-        if (count($transparent) === 0) {
-            $transparent = null;
-        }
+		}
 
-        $blocks = [];
-        $nextIndex = 0;
-
-        $itr = new BlockIterator($this->level, $this->getPosition(), $this->getDirectionVector(), $this->getEyeHeight(), $maxDistance);
-
-        while ($itr->valid()) {
-            $itr->next();
-            $block = $itr->current();
-            $blocks[$nextIndex++] = $block;
-
-            if ($maxLength !== 0 and count($blocks) > $maxLength) {
-                array_shift($blocks);
-                --$nextIndex;
-            }
-
-            $id = $block->getId();
-
-            if ($transparent === null) {
-                if ($id !== 0) {
-                    break;
-                }
-            } else {
-                if (!isset($transparent[$id])) {
-                    break;
-                }
-            }
-        }
-
-        return $blocks;
-    }
-
-
-    /**
-     *
-     * @param int     $maxDistance
-     * @param array   $transparent (optional)
-     * @return Block
-     */
-    public function getTargetBlock($maxDistance, array $transparent = [])
-    {
-        try {
-            $block = $this->getLineOfSight($maxDistance, 1, $transparent)[0];
-            if ($block instanceof Block) {
-                return $block;
-            }
-        } catch (\ArrayOutOfBoundsException $e) {
-        }
-
-        return null;
-    }
+		return null;
+	}
 }

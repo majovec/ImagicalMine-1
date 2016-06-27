@@ -1,75 +1,49 @@
 <?php
-/**
- * src/pocketmine/entity/ZombieVillager.php
- *
- * @package default
- */
-
-
-/*
- *
- *  _                       _           _ __  __ _
- * (_)                     (_)         | |  \/  (_)
- *  _ _ __ ___   __ _  __ _ _  ___ __ _| | \  / |_ _ __   ___
- * | | '_ ` _ \ / _` |/ _` | |/ __/ _` | | |\/| | | '_ \ / _ \
- * | | | | | | | (_| | (_| | | (_| (_| | | |  | | | | | |  __/
- * |_|_| |_| |_|\__,_|\__, |_|\___\__,_|_|_|  |_|_|_| |_|\___|
- *                     __/ |
- *                    |___/
- *
- * This program is a third party build by ImagicalMine.
- *
- * PocketMine is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * @author ImagicalMine Team
- * @link http://forums.imagicalcorp.ml/
- *
- *
-*/
-
 namespace pocketmine\entity;
 
 use pocketmine\Player;
+use pocketmine\nbt\tag\IntTag;
 
-class ZombieVillager extends Zombie
-{
-    public $width = 1.031;
-    public $length = 0.891;
-    public $height = 2.125;
+class ZombieVillager extends Zombie{
+	const NETWORK_ID = 44;
+	
+	public $width = 1.031;
+	public $length = 0.891;
+	public $height = 2.125;
 
-    /**
-     *
-     */
-    public function initEntity()
-    {
-        $this->setMaxHealth(20);
-        parent::initEntity();
-    }
+	public function initEntity(){
+		$this->setMaxHealth(20);
+		parent::initEntity();
+		if(!isset($this->namedtag->Profession) || $this->getVariant() > 4){
+			$this->setVariant(mt_rand(0, 4));
+		}
+		$this->setDataProperty(16, self::DATA_TYPE_BYTE, $this->getVariant());
+	}
 
+	public function getName(){
+		return "Zombie Villager";
+	}
 
-    /**
-     *
-     * @return unknown
-     */
-    public function getName()
-    {
-        return "Zombie Villager";
-    }
+	public function spawnTo(Player $player){
+		$pk = $this->addEntityDataPacket($player);
+		$pk->type = ZombieVillager::NETWORK_ID;
 
+		$player->dataPacket($pk);
+		parent::spawnTo($player);
+	}
 
-    /**
-     *
-     * @param Player  $player
-     */
-    public function spawnTo(Player $player)
-    {
-        $pk = $this->addEntityDataPacket($player);
-        $pk->type = Zombie::NETWORK_ID;
+	/**
+	 * Sets the zombievillager profession
+	 *
+	 * @param $profession
+	 */
+	public function setVariant($type){
+		$this->namedtag->Profession = new IntTag("Profession", $type);
+		$this->setDataProperty(16, self::DATA_TYPE_BYTE, $type);
+	}
 
-        $player->dataPacket($pk);
-        parent::spawnTo($player);
-    }
+	public function getVariant(){
+		return $this->namedtag["Profession"];
+	}
+
 }

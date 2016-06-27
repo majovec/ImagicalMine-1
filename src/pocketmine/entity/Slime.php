@@ -1,92 +1,54 @@
 <?php
-/**
- * src/pocketmine/entity/Slime.php
- *
- * @package default
- */
-
-
-/*
- *
- *  _                       _           _ __  __ _
- * (_)                     (_)         | |  \/  (_)
- *  _ _ __ ___   __ _  __ _ _  ___ __ _| | \  / |_ _ __   ___
- * | | '_ ` _ \ / _` |/ _` | |/ __/ _` | | |\/| | | '_ \ / _ \
- * | | | | | | | (_| | (_| | | (_| (_| | | |  | | | | | |  __/
- * |_|_| |_| |_|\__,_|\__, |_|\___\__,_|_|_|  |_|_|_| |_|\___|
- *                     __/ |
- *                    |___/
- *
- * This program is a third party build by ImagicalMine.
- *
- * PocketMine is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * @author ImagicalMine Team
- * @link http://forums.imagicalcorp.ml/
- *
- *
-*/
-
 namespace pocketmine\entity;
 
-use pocketmine\item\Item as drp;
+use pocketmine\item\Item as ItemItem;
 use pocketmine\Player;
+use pocketmine\nbt\tag\IntTag;
 
-class Slime extends Living
-{
+class Slime extends Living{
     const NETWORK_ID = 37;
-
     const DATA_SIZE = 16;
 
     public $height = 2;
     public $width = 2;
-    public $lenght = 2;
+    public $lenght = 2;//TODO: Size
+	
+	protected $exp_min = 1;
+	protected $exp_max = 1;//TODO: Size
 
-    /**
-     *
-     */
-    public function initEntity()
-    {
+    public function initEntity(){
         $this->setMaxHealth(16);
         parent::initEntity();
+		if(!isset($this->namedtag->Size)){
+			$this->setSize(mt_rand(0, 3));
+		}
     }
 
-
-    /**
-     *
-     * @return unknown
-     */
-    public function getName()
-    {
+    public function getName(){
         return "Slime";
     }
 
-
-    /**
-     *
-     * @param Player  $player
-     */
-    public function spawnTo(Player $player)
-    {
+    public function spawnTo(Player $player){
         $pk = $this->addEntityDataPacket($player);
-        $pk->type = Slime::NETWORK_ID;
+        $pk->type = self::NETWORK_ID;
 
         $player->dataPacket($pk);
         parent::spawnTo($player);
     }
 
-
-    /**
-     *
-     * @return unknown
-     */
-    public function getDrops()
-    {
+    public function getDrops(){
         return [
-            drp::get(drp::SLIMEBALL, 0, mt_rand(0, 2))
+            ItemItem::get(ItemItem::SLIMEBALL, 0, mt_rand(0, 2))
         ];
     }
+
+    public function setSize($value){
+        $this->namedtag->Size = new IntTag("Size", $value);
+		$this->setDataProperty(self::DATA_SIZE, self::DATA_TYPE_BYTE, $value);
+    }
+
+    public function getSize(){
+        return $this->namedtag["Size"];
+    }
+
 }

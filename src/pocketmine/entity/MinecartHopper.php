@@ -1,46 +1,58 @@
 <?php
-/**
- * src/pocketmine/entity/MinecartHopper.php
- *
- * @package default
- */
-
-
-/*
- *
- *  _                       _           _ __  __ _
- * (_)                     (_)         | |  \/  (_)
- *  _ _ __ ___   __ _  __ _ _  ___ __ _| | \  / |_ _ __   ___
- * | | '_ ` _ \ / _` |/ _` | |/ __/ _` | | |\/| | | '_ \ / _ \
- * | | | | | | | (_| | (_| | | (_| (_| | | |  | | | | | |  __/
- * |_|_| |_| |_|\__,_|\__, |_|\___\__,_|_|_|  |_|_|_| |_|\___|
- *                     __/ |
- *                    |___/
- *
- * This program is a third party build by ImagicalMine.
- *
- * PocketMine is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * @author ImagicalMine Team
- * @link http://forums.imagicalcorp.ml/
- *
- *
-*/
-
 namespace pocketmine\entity;
 
-class MinecartHopper extends Minecart
-{
+use pocketmine\Player;
+use pocketmine\item\Item as ItemItem;
+use pocketmine\event\entity\EntityRegainHealthEvent;
 
-    /**
-     *
-     * @return unknown
-     */
-    public function getName()
-    {
-        return "Minecart with Hopper";
+class MinecartHopper extends Snake{
+
+     const NETWORK_ID = 96;
+     
+    public function initEntity(){
+        $this->setMaxHealth(4);
+        $this->setHealth($this->getMaxHealth());
+        parent::initEntity();
     }
+
+	public function spawnTo(Player $player){
+		$pk = $this->addEntityDataPacket($player);
+		$pk->type = self::NETWORK_ID;
+		$player->dataPacket($pk);
+		parent::spawnTo($player);
+	}
+
+    public function getName(){
+        return "Minecart Hopper";
+    }
+
+    public function onUpdate($currentTick){
+    	if($this->isAlive()){
+    		$this->timings->startTiming();
+    		$hasUpdate = false;
+    		
+    		if($this->isLinked() && $this->getlinkedTarget() !== null){
+    			$hasUpdate = true;
+				$newx = $this->getX() - $this->getlinkedTarget()->getX();
+				$newy = $this->getY() - $this->getlinkedTarget()->getY();
+				$newz = $this->getZ() - $this->getlinkedTarget()->getZ();
+				$this->move($newx, $newy, $newz);
+				$this->updateMovement();
+			}
+			if($this->getHealth() < $this->getMaxHealth()){
+				$this->heal(0.1, new EntityRegainHealthEvent($this, 0.1, EntityRegainHealthEvent::CAUSE_CUSTOM));
+				$hasUpdate = true;
+    		}
+    			
+    		$this->timings->stopTiming();
+    
+    		return $hasUpdate;
+    	}
+    }
+
+    public function getDrops(){
+        return [ItemItem::get(ItemItem::MINECART, 0, 1),ItemItem::get(ItemItem::HOPPER, 0, 1)];
+    }
+    
+    //TODO: Open inventory, add inventory, drop inventory contents
 }
