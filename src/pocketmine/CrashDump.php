@@ -1,48 +1,14 @@
 <?php
-/**
- * src/pocketmine/CrashDump.php
- *
- * @package default
- */
-
-
-/*
- *
- *  _                       _           _ __  __ _
- * (_)                     (_)         | |  \/  (_)
- *  _ _ __ ___   __ _  __ _ _  ___ __ _| | \  / |_ _ __   ___
- * | | '_ ` _ \ / _` |/ _` | |/ __/ _` | | |\/| | | '_ \ / _ \
- * | | | | | | | (_| | (_| | | (_| (_| | | |  | | | | | |  __/
- * |_|_| |_| |_|\__,_|\__, |_|\___\__,_|_|_|  |_|_|_| |_|\___|
- *                     __/ |
- *                    |___/
- *
- * This program is a third party build by ImagicalMine.
- *
- * ImagicalMine is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * @author ImagicalMine Team
- * @link http://forums.imagicalmine.net/
- *
- *
-*/
 
 namespace pocketmine;
 
 use pocketmine\network\protocol\Info;
-use pocketmine\plugin\PluginBase;
-use pocketmine\plugin\PluginLoadOrder;
-use pocketmine\utils\Utils;
-use pocketmine\utils\VersionString;
+use pocketmine\plugin\{PluginBase,PluginLoadOrder};
+use pocketmine\utils\{Utils,VersionString};
 use raklib\RakLib;
 
-class CrashDump
-{
-
-    /** @var Server */
+class CrashDump {
+    
     private $server;
     private $fp;
     private $time;
@@ -50,10 +16,6 @@ class CrashDump
     private $encodedData = null;
     private $path;
 
-    /**
-     *
-     * @param Server  $server
-     */
     public function __construct(Server $server)
     {
         $this->time = time();
@@ -69,46 +31,25 @@ class CrashDump
         $this->baseCrash();
         $this->generalData();
         $this->pluginsData();
-
         $this->extraData();
-
         $this->encodeData();
     }
-
-
-    /**
-     *
-     * @return unknown
-     */
+    
     public function getPath()
     {
         return $this->path;
     }
-
-
-    /**
-     *
-     * @return unknown
-     */
+    
     public function getEncodedData()
     {
         return $this->encodedData;
     }
 
-
-    /**
-     *
-     * @return unknown
-     */
     public function getData()
     {
         return $this->data;
     }
 
-
-    /**
-     *
-     */
     private function encodeData()
     {
         $this->addLine();
@@ -122,10 +63,6 @@ class CrashDump
         $this->addLine("===END CRASH DUMP===");
     }
 
-
-    /**
-     *
-     */
     private function pluginsData()
     {
         if (class_exists("pocketmine\\plugin\\PluginManager", false)) {
@@ -151,10 +88,6 @@ class CrashDump
         }
     }
 
-
-    /**
-     *
-     */
     private function extraData()
     {
         global $arguments;
@@ -185,10 +118,6 @@ class CrashDump
         }
     }
 
-
-    /**
-     *
-     */
     private function baseCrash()
     {
         global $lastExceptionError, $lastError;
@@ -275,10 +204,6 @@ class CrashDump
         $this->addLine();
     }
 
-
-    /**
-     *
-     */
     private function generalData()
     {
         $version = new VersionString();
@@ -302,21 +227,11 @@ class CrashDump
         $this->addLine("OS : " . PHP_OS . ", " . Utils::getOS());
     }
 
-
-    /**
-     *
-     * @param unknown $line (optional)
-     */
     public function addLine($line = "")
     {
         fwrite($this->fp, $line . PHP_EOL);
     }
 
-
-    /**
-     *
-     * @param unknown $str
-     */
     public function add($str)
     {
         fwrite($this->fp, $str);
