@@ -1,34 +1,4 @@
 <?php
-/**
- * src/pocketmine/MemoryManager.php
- *
- * @package default
- */
-
-
-/*
- *
- *  _                       _           _ __  __ _
- * (_)                     (_)         | |  \/  (_)
- *  _ _ __ ___   __ _  __ _ _  ___ __ _| | \  / |_ _ __   ___
- * | | '_ ` _ \ / _` |/ _` | |/ __/ _` | | |\/| | | '_ \ / _ \
- * | | | | | | | (_| | (_| | | (_| (_| | | |  | | | | | |  __/
- * |_|_| |_| |_|\__,_|\__, |_|\___\__,_|_|_|  |_|_|_| |_|\___|
- *                     __/ |
- *                    |___/
- *
- * This program is a third party build by ImagicalMine.
- *
- * PocketMine is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * @author ImagicalMine Team
- * @link http://forums.imagicalmine.net/
- *
- *
-*/
 
 namespace pocketmine;
 
@@ -39,8 +9,7 @@ use pocketmine\utils\Utils;
 
 class MemoryManager
 {
-
-    /** @var Server */
+    
     private $server;
 
     private $memoryLimit;
@@ -72,21 +41,12 @@ class MemoryManager
     //private $leakInfo = [];
     //private $leakSeed = 0;
 
-    /**
-     *
-     * @param Server  $server
-     */
     public function __construct(Server $server)
     {
         $this->server = $server;
-
         $this->init();
     }
 
-
-    /**
-     *
-     */
     private function init()
     {
         $this->memoryLimit = ((int) $this->server->getProperty("memory.main-limit", 0)) * 1024 * 1024;
@@ -142,45 +102,21 @@ class MemoryManager
         gc_enable();
     }
 
-
-    /**
-     *
-     * @return unknown
-     */
     public function isLowMemory()
     {
         return $this->lowMemory;
     }
 
-
-    /**
-     *
-     * @return unknown
-     */
     public function canUseChunkCache()
     {
         return !($this->lowMemory and $this->chunkTrigger);
     }
 
-
-    /**
-     *
-     * @param unknown $distance
-     * @return unknown
-     */
     public function getViewDistance($distance)
     {
         return $this->lowMemory ? min($this->chunkLimit, $distance) : $distance;
     }
 
-
-    /**
-     *
-     * @param unknown $memory
-     * @param unknown $limit
-     * @param unknown $global       (optional)
-     * @param unknown $triggerCount (optional)
-     */
     public function trigger($memory, $limit, $global = false, $triggerCount = 0)
     {
         $this->server->getLogger()->debug("[Memory Manager] ".($global ? "Global " : "") ."Low memory triggered, limit ". round(($limit / 1024) / 1024, 2)."MB, using ". round(($memory / 1024) / 1024, 2)."MB");
@@ -208,10 +144,6 @@ class MemoryManager
         $this->server->getLogger()->debug("[Memory Manager] Freed " . round(($ev->getMemoryFreed() / 1024) / 1024, 2)."MB, $cycles cycles");
     }
 
-
-    /**
-     *
-     */
     public function check()
     {
         Timings::$memoryManagerTimer->startTiming();
@@ -250,11 +182,6 @@ class MemoryManager
         Timings::$memoryManagerTimer->stopTiming();
     }
 
-
-    /**
-     *
-     * @return unknown
-     */
     public function triggerGarbageCollector()
     {
         Timings::$garbageCollectorTimer->startTiming();
@@ -273,13 +200,6 @@ class MemoryManager
         return $cycles;
     }
 
-
-    /**
-     *
-     * @param unknown $outputFolder
-     * @param unknown $maxNesting
-     * @param unknown $maxStringSize
-     */
     public function dumpServerMemory($outputFolder, $maxNesting, $maxStringSize)
     {
         gc_disable();
@@ -371,17 +291,6 @@ class MemoryManager
         $this->server->forceShutdown();
     }
 
-
-    /**
-     *
-     * @param unknown $from
-     * @param unknown $data          (reference)
-     * @param unknown $objects       (reference)
-     * @param unknown $refCounts     (reference)
-     * @param unknown $recursion
-     * @param unknown $maxNesting
-     * @param unknown $maxStringSize
-     */
     private function continueDump($from, &$data, &$objects, &$refCounts, $recursion, $maxNesting, $maxStringSize)
     {
         if ($maxNesting <= 0) {
