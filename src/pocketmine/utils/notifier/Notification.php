@@ -37,7 +37,7 @@ class Notification {
         
          switch(true) {
             case stristr(PHP_OS, 'DAR'): // MACOSX
-            $this->error = null;
+            $this->error = shell_exec("osascript -e 'display notfication \"{$text}\" with title \"{$title}\"'");
             break;
             
             
@@ -47,7 +47,7 @@ class Notification {
             
             
             case stristr(PHP_OS, 'LINUX'): // LINUX
-            $this->error = null;
+            $this->error = shell_exec("notify-send '{$title}' '{$text}'");
             break;
         }
     }
