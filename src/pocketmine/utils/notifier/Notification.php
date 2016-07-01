@@ -34,8 +34,32 @@ class Notification {
         if($pathToIcon == "") {
             $pathToIcon = Server::getInstance()->getFilePath() . "bin/ImagicalMine.ico";
         }
-        
-         switch(true) {
+        $this->text = $text;
+        $this->title = $title;
+        $this->path = $pathToIcon;
+    }
+    
+    
+    public function setText(string $text) {
+        $this->text = $text;
+    }
+    
+    
+    public function setTitle(string $title) {
+        $this->title = $title;
+    }
+    
+    
+    public function setPath(string $path) {
+        $this->path = $path;
+    }
+    
+    
+    public function send() {
+        $title = $this->title;
+        $text = $this->text;
+        $pathToIcon = $this->path;
+        switch(true) {
             case stristr(PHP_OS, 'DAR'): // MACOSX
             $this->error = shell_exec("osascript -e 'display notfication \"{$text}\" with title \"{$title}\"'");
             break;
