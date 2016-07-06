@@ -71,7 +71,7 @@ __[Back to QuickLinks](https://github.com/Inactive-to-Reactive/ImagicalMine/blob
 ```
 (New-Object Net.WebClient).DownloadFile("http://jenkins.terweij.nl/job/ImagicalMine/lastSuccessfulBuild/artifact/releases/ImagicalMine.phar","$((Resolve-Path .\).Path)\ImagicalMine.phar")
 ```
-2. To stop the server and restart 20 seconds later:
+2. To stop the server and restart 10 seconds later:
 ..
 ```
 cmd /c "$((Resolve-Path .\).Path)\forceshutdown.cmd"
