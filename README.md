@@ -71,18 +71,18 @@ __[Back to QuickLinks](https://github.com/Inactive-to-Reactive/ImagicalMine/blob
 ```
 (New-Object Net.WebClient).DownloadFile("http://jenkins.terweij.nl/job/ImagicalMine/lastSuccessfulBuild/artifact/releases/ImagicalMine.phar","$((Resolve-Path .\).Path)\ImagicalMine.phar")
 ```
-by @Ad5001
 2. To stop the server and restart 20 seconds later:
 ..* Not as complicated as the previous script, but still takes a while to figure out
 ```
-ALSO COMING SOON;
+cmd /c "$((Resolve-Path .\).Path)\forceshutdown.cmd"
+cmd /c "$((Resolve-Path .\).Path)\start.cmd"
 ```
 3. Backup script
 ..* Definitely the most complicated of the three scripts
 ```
 COMING SOON;
 ```
-All credit goes to @remotevase AKA remote_vase and his father for making these scripts together <br>
+All credit goes to @Ad5001 <@remotevase AKA remote_vase and his father for making these scripts together> <br>
 __[Back to QuickLinks](https://github.com/Inactive-to-Reactive/ImagicalMine/blob/master/README.md#quick-links-instead-of-scrolling-click-these)__
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 ## Acknowledgements
