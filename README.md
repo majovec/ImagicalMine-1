@@ -71,11 +71,11 @@ __[Back to QuickLinks](https://github.com/Inactive-to-Reactive/ImagicalMine/blob
 ```
 (New-Object Net.WebClient).DownloadFile("http://jenkins.terweij.nl/job/ImagicalMine/lastSuccessfulBuild/artifact/releases/ImagicalMine.phar","$((Resolve-Path .\).Path)\ImagicalMine.phar")
 ```
-2. To stop the server and restart 10 seconds later:
+2. To stop the server and restart 2 seconds later:
 ..
 ```
 cmd /c "$((Resolve-Path .\).Path)\forceshutdown.cmd"
-Start-Sleep -s 10
+Start-Sleep -s 2
 cmd /c "$((Resolve-Path .\).Path)\start.cmd"
 ```
 3. Backup script
@@ -86,7 +86,7 @@ $a = Get-Date
 new-item "$((Resolve-Path .\).Path)\backups\$($a.Year)-$($a.Month)-$($a.Day)-$($a.Hour)" -itemtype directory
 Copy-Item "$((Resolve-Path .\).Path)\*" "$((Resolve-Path .\).Path)\backups\$($a.Year)-$($a.Month)-$($a.Day)-$($a.Hour)" -recurse -Exclude ".git"
 ```
-All credit goes to @Ad5001 for making these script and @remote_vase for the ideas. <!---@remotevase AKA remote_vase and his father for making these scripts together --> <br>
+All credit goes to @Ad5001 for making these script and @remote_vase for the ideas. <!---@remotevase AKA remote_vase and his father for making the future improved scripts together --> <br>
 __[Back to QuickLinks](https://github.com/Inactive-to-Reactive/ImagicalMine/blob/master/README.md#quick-links-instead-of-scrolling-click-these)__
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 ## Acknowledgements
