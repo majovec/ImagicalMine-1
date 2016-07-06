@@ -69,8 +69,9 @@ __[Back to QuickLinks](https://github.com/Inactive-to-Reactive/ImagicalMine/blob
 1. To download the latest stable build using powershell: 
 ⋅⋅* Not as easy as you would think...
 ```
-COMING SOON;
+(New-Object Net.WebClient).DownloadFile("http://jenkins.terweij.nl/job/ImagicalMine/lastSuccessfulBuild/artifact/releases/ImagicalMine.phar","$((Resolve-Path .\).Path)\ImagicalMine.phar")
 ```
+by @Ad5001
 2. To stop the server and restart 20 seconds later:
 ..* Not as complicated as the previous script, but still takes a while to figure out
 ```
