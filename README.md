@@ -75,6 +75,7 @@ __[Back to QuickLinks](https://github.com/Inactive-to-Reactive/ImagicalMine/blob
 ..
 ```
 cmd /c "$((Resolve-Path .\).Path)\forceshutdown.cmd"
+Start-Sleep -s 10
 cmd /c "$((Resolve-Path .\).Path)\start.cmd"
 ```
 3. Backup script
