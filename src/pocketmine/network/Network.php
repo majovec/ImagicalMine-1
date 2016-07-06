@@ -1,5 +1,12 @@
 <?php
 /**
+ * src/pocketmine/network/Network.php
+ *
+ * @package default
+ */
+
+
+/**
  * Network-related classes
  */
 namespace pocketmine\network;
@@ -19,12 +26,10 @@ use pocketmine\network\protocol\ContainerSetDataPacket;
 use pocketmine\network\protocol\ContainerSetSlotPacket;
 use pocketmine\network\protocol\CraftingDataPacket;
 use pocketmine\network\protocol\CraftingEventPacket;
-use pocketmine\network\protocol\ChangeDimensionPacket;
 use pocketmine\network\protocol\DataPacket;
 use pocketmine\network\protocol\DropItemPacket;
 use pocketmine\network\protocol\FullChunkDataPacket;
 use pocketmine\network\protocol\Info;
-use pocketmine\network\protocol\RequestChunkRadiusPacket;
 use pocketmine\network\protocol\SetEntityLinkPacket;
 use pocketmine\network\protocol\BlockEntityDataPacket;
 use pocketmine\network\protocol\EntityEventPacket;
@@ -41,7 +46,6 @@ use pocketmine\network\protocol\MoveEntityPacket;
 use pocketmine\network\protocol\MovePlayerPacket;
 use pocketmine\network\protocol\PlayerActionPacket;
 use pocketmine\network\protocol\MobArmorEquipmentPacket;
-use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\network\protocol\MobEquipmentPacket;
 use pocketmine\network\protocol\RemoveBlockPacket;
 use pocketmine\network\protocol\RemoveEntityPacket;
@@ -51,13 +55,11 @@ use pocketmine\network\protocol\SetDifficultyPacket;
 use pocketmine\network\protocol\SetEntityDataPacket;
 use pocketmine\network\protocol\SetEntityMotionPacket;
 use pocketmine\network\protocol\SetHealthPacket;
-use pocketmine\network\protocol\SetPlayerGameTypePacket;
 use pocketmine\network\protocol\SetSpawnPositionPacket;
 use pocketmine\network\protocol\SetTimePacket;
 use pocketmine\network\protocol\StartGamePacket;
 use pocketmine\network\protocol\TakeItemEntityPacket;
 use pocketmine\network\protocol\BlockEventPacket;
-use pocketmine\network\protocol\UpdateAttributesPacket;
 use pocketmine\network\protocol\UpdateBlockPacket;
 use pocketmine\network\protocol\UseItemPacket;
 use pocketmine\network\protocol\PlayerListPacket;
@@ -65,11 +67,21 @@ use pocketmine\network\protocol\PlayerInputPacket;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\Binary;
-use pocketmine\utils\MainLogger;
 
-class Network{
+class Network {
 
 	public static $BATCH_THRESHOLD = 512;
+
+	/** @deprecated CHANNEL - 0.13*/
+	const CHANNEL_NONE = 0;
+	const CHANNEL_PRIORITY = 1; //Priority channel, only to be used when it matters
+	const CHANNEL_WORLD_CHUNKS = 2; //Chunk sending
+	const CHANNEL_MOVEMENT = 3; //Movement sending
+	const CHANNEL_BLOCKS = 4; //Block updates or explosions
+	const CHANNEL_WORLD_EVENTS = 5; //Entity, level or tile entity events
+	const CHANNEL_ENTITY_SPAWNING = 6; //Entity spawn/despawn channel
+	const CHANNEL_TEXT = 7; //Chat and other text stuff
+	const CHANNEL_END = 31;
 
 	/** @var \SplFixedArray */
 	private $packetPool;
@@ -88,7 +100,11 @@ class Network{
 
 	private $name;
 
-	public function __construct(Server $server){
+	/**
+	 *
+	 * @param Server  $server
+	 */
+	public function __construct(Server $server) {
 
 		$this->registerPackets();
 
@@ -96,41 +112,65 @@ class Network{
 
 	}
 
-	public function addStatistics($upload, $download){
+
+	/**
+	 *
+	 * @param unknown $upload
+	 * @param unknown $download
+	 */
+	public function addStatistics($upload, $download) {
 		$this->upload += $upload;
 		$this->download += $download;
 	}
 
-	public function getUpload(){
+
+	/**
+	 *
+	 * @return unknown
+	 */
+	public function getUpload(): int{
 		return $this->upload;
 	}
 
-	public function getDownload(){
+
+	/**
+	 *
+	 * @return unknown
+	 */
+	public function getDownload(): int{
 		return $this->download;
 	}
 
-	public function resetStatistics(){
+
+	/**
+	 *
+	 */
+	public function resetStatistics() {
 		$this->upload = 0;
 		$this->download = 0;
 	}
 
+
 	/**
+	 *
 	 * @return SourceInterface[]
 	 */
-	public function getInterfaces(){
+	public function getInterfaces(): array{
 		return $this->interfaces;
 	}
 
-	public function processInterfaces(){
-		foreach($this->interfaces as $interface){
+
+	/**
+	 *
+	 */
+	public function processInterfaces() {
+		foreach ($this->interfaces as $interface) {
 			try {
 				$interface->process();
-			}catch(\Throwable $e){
+			}catch(\Throwable $e) {
 				$logger = $this->server->getLogger();
-				if(\pocketmine\DEBUG > 1){
-					if($logger instanceof MainLogger){
-						$logger->logException($e);
-					}
+				if (\pocketmine\DEBUG > 1) {
+					$logger->logException($e);
 				}
 
 				$interface->emergencyShutdown();
@@ -140,107 +180,135 @@ class Network{
 		}
 	}
 
+
 	/**
+	 *
 	 * @param SourceInterface $interface
 	 */
-	public function registerInterface(SourceInterface $interface){
+	public function registerInterface(SourceInterface $interface) {
 		$this->interfaces[$hash = spl_object_hash($interface)] = $interface;
-		if($interface instanceof AdvancedSourceInterface){
+		if ($interface instanceof AdvancedSourceInterface) {
 			$this->advancedInterfaces[$hash] = $interface;
 			$interface->setNetwork($this);
 		}
 		$interface->setName($this->name);
 	}
 
+
 	/**
+	 *
 	 * @param SourceInterface $interface
 	 */
-	public function unregisterInterface(SourceInterface $interface){
+	public function unregisterInterface(SourceInterface $interface) {
 		unset($this->interfaces[$hash = spl_object_hash($interface)],
 			$this->advancedInterfaces[$hash]);
 	}
 
+
 	/**
 	 * Sets the server name shown on each interface Query
 	 *
-	 * @param string $name
+	 * @param string  $name
 	 */
-	public function setName($name){
+	public function setName($name) {
 		$this->name = (string) $name;
-		foreach($this->interfaces as $interface){
+		foreach ($this->interfaces as $interface) {
 			$interface->setName($this->name);
 		}
 	}
 
-	public function getName(){
+
+	/**
+	 *
+	 * @return unknown
+	 */
+	public function getName(): string{
 		return $this->name;
 	}
 
-	public function updateName(){
-		foreach($this->interfaces as $interface){
+
+	/**
+	 *
+	 */
+	public function updateName() {
+		foreach ($this->interfaces as $interface) {
 			$interface->setName($this->name);
 		}
 	}
 
+
 	/**
-	 * @param int        $id 0-255
-	 * @param DataPacket $class
+	 *
+	 * @param int     $id    0-255
+	 * @param string  $class
 	 */
-	public function registerPacket($id, $class){
+	public function registerPacket($id, $class) {
 		$this->packetPool[$id] = new $class;
 	}
 
-	public function getServer(){
+
+	/**
+	 *
+	 * @return unknown
+	 */
+	public function getServer(): Server{
 		return $this->server;
 	}
 
-	public function processBatch(BatchPacket $packet, Player $p){
+
+	/**
+	 *
+	 * @param BatchPacket $packet
+	 * @param Player      $p
+	 */
+	public function processBatch(BatchPacket $packet, Player $p) {
 		$str = zlib_decode($packet->payload, 1024 * 1024 * 64); //Max 64MB
 		$len = strlen($str);
 		$offset = 0;
 		try{
-			while($offset < $len){
+			while ($offset < $len) {
 				$pkLen = Binary::readInt(substr($str, $offset, 4));
 				$offset += 4;
 
 				$buf = substr($str, $offset, $pkLen);
 				$offset += $pkLen;
-
-				if(($pk = $this->getPacket(ord($buf{0}))) !== null){
-					if($pk::NETWORK_ID === Info::BATCH_PACKET){
+				//@todo backward compatible for 0.13 was
+				//if(($pk = $this->getPacket(ord($buf{0}))) !== null){
+				if (($pk = $this->getPacket(ord($buf{0}))) !== null) {
+					if ($pk::NETWORK_ID === Info::BATCH_PACKET) {
 						throw new \InvalidStateException("Invalid BatchPacket inside BatchPacket");
 					}
-
-					$pk->setBuffer($buf, 1);
+					//@todo backward compatible for 0.13 was
+					//$pk->setBuffer($buf, 1);
+					$pk->setBuffer($buf, 1); //blameshoghi
 
 					$pk->decode();
 					$p->handleDataPacket($pk);
 
-					if($pk->getOffset() <= 0){
+					if ($pk->getOffset() <= 0) {
 						return;
 					}
 				}
 			}
-		}catch(\Throwable $e){
-			if(\pocketmine\DEBUG > 1){
+		}catch(\Throwable $e) {
+			if (\pocketmine\DEBUG > 1) {
 				$logger = $this->server->getLogger();
-				if($logger instanceof MainLogger){
-					$logger->debug("BatchPacket " . " 0x" . bin2hex($packet->payload));
-					$logger->logException($e);
-				}
+				$logger->debug("BatchPacket " . " 0x" . bin2hex($packet->payload));
+				$logger->logException($e);
 			}
 		}
 	}
 
+
 	/**
-	 * @param $id
 	 *
+	 * @param unknown $id
 	 * @return DataPacket
 	 */
-	public function getPacket($id){
+	public function getPacket($id) {
 		/** @var DataPacket $class */
 		$class = $this->packetPool[$id];
-		if($class !== null){
+		if ($class !== null) {
 			return clone $class;
 		}
 		return null;
@@ -248,29 +316,35 @@ class Network{
 
 
 	/**
-	 * @param string $address
-	 * @param int    $port
-	 * @param string $payload
+	 *
+	 * @param string  $address
+	 * @param int     $port
+	 * @param string  $payload
 	 */
-	public function sendPacket($address, $port, $payload){
-		foreach($this->advancedInterfaces as $interface){
+	public function sendPacket($address, $port, $payload) {
+		foreach ($this->advancedInterfaces as $interface) {
 			$interface->sendRawPacket($address, $port, $payload);
 		}
 	}
 
+
 	/**
 	 * Blocks an IP address from the main interface. Setting timeout to -1 will block it forever
 	 *
-	 * @param string $address
-	 * @param int    $timeout
+	 * @param string  $address
+	 * @param int     $timeout (optional)
 	 */
-	public function blockAddress($address, $timeout = 300){
-		foreach($this->advancedInterfaces as $interface){
+	public function blockAddress($address, $timeout = 300) {
+		foreach ($this->advancedInterfaces as $interface) {
 			$interface->blockAddress($address, $timeout);
 		}
 	}
 
-	private function registerPackets(){
+
+	/**
+	 *
+	 */
+	private function registerPackets() {
 		$this->packetPool = new \SplFixedArray(256);
 
 		$this->registerPacket(ProtocolInfo::LOGIN_PACKET, LoginPacket::class);
@@ -294,8 +368,6 @@ class Network{
 		$this->registerPacket(ProtocolInfo::LEVEL_EVENT_PACKET, LevelEventPacket::class);
 		$this->registerPacket(ProtocolInfo::BLOCK_EVENT_PACKET, BlockEventPacket::class);
 		$this->registerPacket(ProtocolInfo::ENTITY_EVENT_PACKET, EntityEventPacket::class);
-		$this->registerPacket(ProtocolInfo::MOB_EFFECT_PACKET, MobEffectPacket::class);
-		$this->registerPacket(ProtocolInfo::UPDATE_ATTRIBUTES_PACKET, UpdateAttributesPacket::class);
 		$this->registerPacket(ProtocolInfo::MOB_EQUIPMENT_PACKET, MobEquipmentPacket::class);
 		$this->registerPacket(ProtocolInfo::MOB_ARMOR_EQUIPMENT_PACKET, MobArmorEquipmentPacket::class);
 		$this->registerPacket(ProtocolInfo::INTERACT_PACKET, InteractPacket::class);
@@ -319,17 +391,13 @@ class Network{
 		$this->registerPacket(ProtocolInfo::CRAFTING_EVENT_PACKET, CraftingEventPacket::class);
 		$this->registerPacket(ProtocolInfo::ADVENTURE_SETTINGS_PACKET, AdventureSettingsPacket::class);
 		$this->registerPacket(ProtocolInfo::BLOCK_ENTITY_DATA_PACKET, BlockEntityDataPacket::class);
-		$this->registerPacket(ProtocolInfo::PLAYER_INPUT_PACKET, PlayerInputPacket::class);
 		$this->registerPacket(ProtocolInfo::FULL_CHUNK_DATA_PACKET, FullChunkDataPacket::class);
 		$this->registerPacket(ProtocolInfo::SET_DIFFICULTY_PACKET, SetDifficultyPacket::class);
-		$this->registerPacket(ProtocolInfo::CHANGE_DIMENSION_PACKET, ChangeDimensionPacket::class);
-		$this->registerPacket(ProtocolInfo::SET_PLAYER_GAMETYPE_PACKET, SetPlayerGameTypePacket::class);
 		$this->registerPacket(ProtocolInfo::PLAYER_LIST_PACKET, PlayerListPacket::class);
-		// $this->registerPacket(ProtocolInfo::TELEMETRY_EVENT_PACKET, TelemetryEventPacket::class);
-		// $this->registerPacket(ProtocolInfo::CLIENTBOUND_MAP_ITEM_DATA_PACKET, ClientboundMapItemDataPacket::class);
-		// $this->registerPacket(ProtocolInfo::MAP_INFO_REQUEST_PACKET, MapInfoRequestPacket::class);
-		$this->registerPacket(ProtocolInfo::REQUEST_CHUNK_RADIUS_PACKET, RequestChunkRadiusPacket::class);
-		$this->registerPacket(ProtocolInfo::CHUNK_RADIUS_UPDATED_PACKET, ChunkRadiusUpdatedPacket::class);
-		// $this->registerPacket(ProtocolInfo::ITEM_FRAME_DROP_ITEM_PACKET, ItemFrameDropItemPacket::class);
+		$this->registerPacket(ProtocolInfo::PLAYER_INPUT_PACKET, PlayerInputPacket::class);
+		$this->registerPacket(ProtocolInfo::REQUEST_CHUNK_RADIUS_PACKET, protocol\RequestChunkRadiusPacket::class);
+		$this->registerPacket(ProtocolInfo::CHUNK_RADIUS_UPDATED_PACKET, protocol\ChunkRadiusUpdatedPacket::class);
 	}
+
+
 }
