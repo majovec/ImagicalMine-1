@@ -1,75 +1,92 @@
 <?php
+/**
+ * src/pocketmine/entity/Ozelot.php
+ *
+ * @package default
+ */
+
+
+/*
+ *
+ *  _                       _           _ __  __ _
+ * (_)                     (_)         | |  \/  (_)
+ *  _ _ __ ___   __ _  __ _ _  ___ __ _| | \  / |_ _ __   ___
+ * | | '_ ` _ \ / _` |/ _` | |/ __/ _` | | |\/| | | '_ \ / _ \
+ * | | | | | | | (_| | (_| | | (_| (_| | | |  | | | | | |  __/
+ * |_|_| |_| |_|\__,_|\__, |_|\___\__,_|_|_|  |_|_|_| |_|\___|
+ *                     __/ |
+ *                    |___/
+ *
+ * This program is a third party build by ImagicalMine.
+ *
+ * PocketMine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * @author ImagicalMine Team
+ * @link http://forums.imagicalcorp.ml/
+ *
+ *
+*/
+
 namespace pocketmine\entity;
 
 use pocketmine\Player;
-use pocketmine\nbt\tag\IntTag;
 
-class Ozelot extends Animal implements Tameable{
-	const NETWORK_ID = 22;
-	
-	const TYPE_NORMAL = 0;
-	const TYPE_BLACK = 1;
-	const TYPE_ORANGE = 2;
-	const TYPE_SIAMESE = 3;
+class Ozelot extends Animal implements Tameable
+{
+    const NETWORK_ID = 22;
 
-	public $width = 0.312;
-	public $length = 2.188;
-	public $height = 0.75;
-	
-	protected $exp_min = 1;
-	protected $exp_max = 3;
+    public $width = 0.312;
+    public $length = 2.188;
+    public $height = 0.75;
 
- 	public static $range = 10;
-	public static $speed = 0.8;
-	public static $jump = 1;
-	public static $mindist = 10;
+    public static $range = 10;
+    public static $speed = 0.8;
+    public static $jump = 1;
+    public static $mindist = 10;
 
-	public function initEntity(){
-		$this->setMaxHealth(10);
-		parent::initEntity();
-
-		//0 burning
-		//1 air time
-		//5 invis
-		//14 age (0=baby 130000 = parent)
-		//15 no movement
-		//16 sheep color
-		//18 type/variant
-		//19 creeper charged
-		//21 love
-
-        if(!isset($this->namedtag->Type) || $this->getVariant() > 3){
-            $this->setVariant(self::TYPE_NORMAL);
-        }
-		$this->setDataProperty(16, self::DATA_TYPE_BYTE, $this->getVariant());
-	}
-
-	public function getName(){
-		return "Ocelot";
-	}
-
-	public function spawnTo(Player $player){
-		$pk = $this->addEntityDataPacket($player);
-		$pk->type = Ozelot::NETWORK_ID;
-
-		$player->dataPacket($pk);
-		parent::spawnTo($player);
-	}
-
-	public function getDrops(){
-		return [];
-	}
-	
-	public function isTamed(){
-		return false;
-	}
-
-    public function setVariant($value){
-        $this->namedtag->Color = new IntTag("Type", $value);
-		$this->setDataProperty(16, self::DATA_TYPE_BYTE, $value);
+    /**
+     *
+     */
+    public function initEntity()
+    {
+        $this->setMaxHealth(10);
+        parent::initEntity();
     }
 
-    public function getVariant(){
-        return $this->namedtag["Type"];
+
+    /**
+     *
+     * @return unknown
+     */
+    public function getName()
+    {
+        return "Ocelot";
+    }
+
+
+    /**
+     *
+     * @param Player  $player
+     */
+    public function spawnTo(Player $player)
+    {
+        $pk = $this->addEntityDataPacket($player);
+        $pk->type = Ozelot::NETWORK_ID;
+
+        $player->dataPacket($pk);
+        parent::spawnTo($player);
+    }
+
+
+    /**
+     *
+     * @return unknown
+     */
+    public function getDrops()
+    {
+        return [];
     }
 }

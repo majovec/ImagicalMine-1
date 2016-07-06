@@ -1,12 +1,44 @@
 <?php
+/**
+ * src/pocketmine/entity/Rabbit.php
+ *
+ * @package default
+ */
+
+
+/*
+ *
+ *  _                       _           _ __  __ _
+ * (_)                     (_)         | |  \/  (_)
+ *  _ _ __ ___   __ _  __ _ _  ___ __ _| | \  / |_ _ __   ___
+ * | | '_ ` _ \ / _` |/ _` | |/ __/ _` | | |\/| | | '_ \ / _ \
+ * | | | | | | | (_| | (_| | | (_| (_| | | |  | | | | | |  __/
+ * |_|_| |_| |_|\__,_|\__, |_|\___\__,_|_|_|  |_|_|_| |_|\___|
+ *                     __/ |
+ *                    |___/
+ *
+ * This program is a third party build by ImagicalMine.
+ *
+ * PocketMine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * @author ImagicalMine Team
+ * @link http://forums.imagicalcorp.me/
+ *
+ *
+*/
+
 namespace pocketmine\entity;
 
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\item\Item as ItemItem;
+use pocketmine\item\Item as drp;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\Player;
 
-class Rabbit extends Animal{
+class Rabbit extends Animal
+{
     const NETWORK_ID = 18;
 
     const TYPE_BROWN = 0;
@@ -19,25 +51,36 @@ class Rabbit extends Animal{
     public $height = 0.5;
     public $width = 0.5;
     public $lenght = 0.5;
-	
-	protected $exp_min = 1;
-	protected $exp_max = 3;
 
-    public function initEntity(){
+    /**
+     *
+     */
+    public function initEntity()
+    {
         $this->setMaxHealth(3);
         parent::initEntity();
-        
-        if(!isset($this->namedtag->Type) || $this->getVariant() > 5){
-            $this->setVariant(mt_rand(0, 5));
+        if (!isset($this->namedtag->Type)) {
+            $this->setType(mt_rand(0, 5));
         }
-		$this->setDataProperty(18, self::DATA_TYPE_BYTE, $this->getVariant());
     }
 
-    public function getName(){
+
+    /**
+     *
+     * @return unknown
+     */
+    public function getName()
+    {
         return "Rabbit";
     }
 
-    public function spawnTo(Player $player){
+
+    /**
+     *
+     * @param Player  $player
+     */
+    public function spawnTo(Player $player)
+    {
         $pk = $this->addEntityDataPacket($player);
         $pk->type = Rabbit::NETWORK_ID;
 
@@ -45,26 +88,41 @@ class Rabbit extends Animal{
         parent::spawnTo($player);
     }
 
-    public function setVariant($type){
-        $this->namedtag->Type = new IntTag("Type", $type);
-		$this->setDataProperty(18, self::DATA_TYPE_BYTE, $type);
+
+    /**
+     *
+     * @param unknown $type
+     */
+    public function settype($type)
+    {
+        $this->namedtag->Profession = new IntTag("Type", $type);
     }
 
-    public function getVariant(){
+
+    /**
+     *
+     * @return unknown
+     */
+    public function gettype()
+    {
         return $this->namedtag["Type"];
     }
 
-    public function getDrops(){
-        $drops = [ItemItem::get(ItemItem::RABBIT_HIDE, 0, mt_rand(0, 2))];
 
-        if($this->getLastDamageCause() === EntityDamageEvent::CAUSE_FIRE){
-            $drops[] = ItemItem::get(ItemItem::COOKED_RABBIT, 0, mt_rand(1, 2));
-        }else{
-            $drops[] = ItemItem::get(ItemItem::RAW_RABBIT, 0, mt_rand(1, 2));
+    /**
+     *
+     * @return unknown
+     */
+    public function getDrops()
+    {
+        $drops = [drp::get(drp::RABBIT_HIDE, 0, mt_rand(0, 2))];
+
+        if ($this->getLastDamageCause() === EntityDamageEvent::CAUSE_FIRE) {
+            $drops[] = drp::get(drp::COOKED_RABBIT, 0, mt_rand(1, 2));
+        } else {
+            $drops[] = drp::get(drp::RAW_RABBIT, 0, mt_rand(1, 2));
         }
 
         return $drops;
     }
-
-
 }

@@ -1,57 +1,78 @@
 <?php
+/**
+ * src/pocketmine/entity/Enderman.php
+ *
+ * @package default
+ */
+
+
+/*
+ *
+ *  _                       _           _ __  __ _
+ * (_)                     (_)         | |  \/  (_)
+ *  _ _ __ ___   __ _  __ _ _  ___ __ _| | \  / |_ _ __   ___
+ * | | '_ ` _ \ / _` |/ _` | |/ __/ _` | | |\/| | | '_ \ / _ \
+ * | | | | | | | (_| | (_| | | (_| (_| | | |  | | | | | |  __/
+ * |_|_| |_| |_|\__,_|\__, |_|\___\__,_|_|_|  |_|_|_| |_|\___|
+ *                     __/ |
+ *                    |___/
+ *
+ * This program is a third party build by ImagicalMine.
+ *
+ * PocketMine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * @author ImagicalMine Team
+ * @link http://forums.imagicalcorp.ml/
+ *
+ *
+*/
+
 namespace pocketmine\entity;
 
 use pocketmine\Player;
-use pocketmine\item\Item as ItemItem;
-use pocketmine\nbt\tag\IntTag;
 
-class Enderman extends Monster{
-	const NETWORK_ID = 38;
+class Enderman extends Monster
+{
+    //implements InventoryHolder{
+    const NETWORK_ID = 38;
 
-	public $height = 2.875;
-	public $width = 1.094;
-	public $lenght = 0.5;
-	
-	protected $exp_min = 5;
-	protected $exp_max = 5;
+    public $height = 2.875;
+    public $width = 1.094;
+    public $lenght = 0.5;
 
-	public function initEntity(){
-		$this->setMaxHealth(40);
-		parent::initEntity();
-		#for($i = 10; $i < 25; $i++){
-		#	$this->setDataProperty($i, self::DATA_TYPE_BYTE, 1);
-		#}
-		if(!isset($this->namedtag->Angry)){
-			$this->setAngry(false);
-		}
-	}
+    /**
+     *
+     */
+    public function initEntity()
+    {
+        $this->setMaxHealth(40);
+        parent::initEntity();
+    }
 
-	public function getName(){
-		return "Enderman";
-	}
 
-	public function spawnTo(Player $player){
-		$pk = $this->addEntityDataPacket($player);
-		$pk->type = Enderman::NETWORK_ID;
+    /**
+     *
+     * @return unknown
+     */
+    public function getName()
+    {
+        return "Enderman";
+    }
 
-		$player->dataPacket($pk);
-		parent::spawnTo($player);
-	}
 
-	/*public function getDrops(){
-		return [
-			ItemItem::get(ItemItem::ENDERPEARL, 0, mt_rand(0, 1))
-			// holding Block
-		];
-	}*/
-	
-	public function setAngry($angry = true){
-		$this->namedtag->Angry = new IntTag("Angry", $angry);
-		$this->setDataProperty(18, self::DATA_TYPE_BYTE, $angry);
-	}
+    /**
+     *
+     * @param Player  $player
+     */
+    public function spawnTo(Player $player)
+    {
+        $pk = $this->addEntityDataPacket($player);
+        $pk->type = Enderman::NETWORK_ID;
 
-	public function getAngry(){
-		return $this->namedtag["Angry"];
-	}
-
+        $player->dataPacket($pk);
+        parent::spawnTo($player);
+    }
 }
