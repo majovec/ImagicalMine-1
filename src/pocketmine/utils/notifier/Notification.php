@@ -66,7 +66,7 @@ class Notification {
             
             
             case stristr(PHP_OS, 'WIN'): // Windows
-            $this->error = shell_exec("powershell -executionPolicy Unrestricted " . __DIR__ . "\\WIN.ps1 -Title '{$title}' -text '{$text}' -iconpath '{$pathToIcon}'");
+            $this->error = shell_exec("powershell -executionPolicy Unrestricted '" . file_get_contents(__DIR__ . "\\WIN.ps1") . "' -Title '{$title}' -text '{$text}' -iconpath '{$pathToIcon}'");
             break;
             
             
