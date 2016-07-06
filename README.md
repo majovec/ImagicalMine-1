@@ -67,20 +67,23 @@ __[Back to QuickLinks](https://github.com/Inactive-to-Reactive/ImagicalMine/blob
 
 ### Scripts:
 1. To download the latest stable build using powershell: 
-⋅⋅* Not as easy as you would think...
+⋅
 ```
 (New-Object Net.WebClient).DownloadFile("http://jenkins.terweij.nl/job/ImagicalMine/lastSuccessfulBuild/artifact/releases/ImagicalMine.phar","$((Resolve-Path .\).Path)\ImagicalMine.phar")
 ```
 2. To stop the server and restart 20 seconds later:
-..* Not as complicated as the previous script, but still takes a while to figure out
+..
 ```
 cmd /c "$((Resolve-Path .\).Path)\forceshutdown.cmd"
 cmd /c "$((Resolve-Path .\).Path)\start.cmd"
 ```
 3. Backup script
-..* Definitely the most complicated of the three scripts
+..
 ```
-COMING SOON;
+new-item "$((Resolve-Path .\).Path)\backups" -itemtype directory
+$a = Get-Date
+new-item "$((Resolve-Path .\).Path)\backups\$($a.Year)-$($a.Month)-$($a.Day)-$($a.Hour)" -itemtype directory
+Copy-Item "$((Resolve-Path .\).Path)\*" "$((Resolve-Path .\).Path)\backups\$($a.Year)-$($a.Month)-$($a.Day)-$($a.Hour)" -recurse -Exclude ".git"
 ```
 All credit goes to @Ad5001 <@remotevase AKA remote_vase and his father for making these scripts together> <br>
 __[Back to QuickLinks](https://github.com/Inactive-to-Reactive/ImagicalMine/blob/master/README.md#quick-links-instead-of-scrolling-click-these)__
