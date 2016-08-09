@@ -35,9 +35,10 @@ interface Info
     /**
      * Actual Minecraft: PE protocol version
      */
-    const CURRENT_PROTOCOL = 81;
-    const ACCEPTED_PROTOCOLS = [81];
-    const LOGIN_PACKET = 0x01;
+    const CURRENT_PROTOCOL = 82;
+    const ACCEPTED_PROTOCOLS = [81, 82];
+
+	const LOGIN_PACKET = 0x01;
 	const PLAY_STATUS_PACKET = 0x02;
 	const SERVER_TO_CLIENT_HANDSHAKE_PACKET = 0x03;
 	const CLIENT_TO_SERVER_HANDSHAKE_PACKET = 0x04;
