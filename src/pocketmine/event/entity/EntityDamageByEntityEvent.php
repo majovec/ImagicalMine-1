@@ -14,7 +14,7 @@ class EntityDamageByEntityEvent extends EntityDamageEvent implements Listener
     //EntityPosition
     private $EntityPosition = new Vector3($this->getEntity()->getX(), $this->getEntity()->getY(), $this->getEntity()->getZ());
     //DamagerPosition
-	private $DamagerPosition = new Vector3($this->getDamager()->getX(), $this->getDamager()->getY(), $this->getDamager()->getZ());
+    private $DamagerPosition = new Vector3($this->getDamager()->getX(), $this->getDamager()->getY(), $this->getDamager()->getZ());
     /** @var Entity */
     private $damager;
     /** @var float */
