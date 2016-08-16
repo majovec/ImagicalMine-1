@@ -75,9 +75,4 @@ class EntityDamageByEntityEvent extends EntityDamageEvent implements Listener
     {
         $this->setKnockBack(0);
     }
-    //block unallowed range
-    if ($DamagerPosition->distance($EntityPosition) > 4) {
-    //cancel hit
-        $this->setCancelled(true);
-    }
 }
