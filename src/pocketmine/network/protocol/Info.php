@@ -28,16 +28,12 @@
  * Minecraft: PE multiplayer protocol implementation
  */
 namespace pocketmine\network\protocol;
-
-interface Info
-{
-
-    /**
-     * Actual Minecraft: PE protocol version
-     */
-    const CURRENT_PROTOCOL = 82;
-    const ACCEPTED_PROTOCOLS = [81, 82];
-
+interface Info{
+	/**
+	 * Actual Minecraft: PE protocol version
+	 */
+	const CURRENT_PROTOCOL = 82;
+	const ACCEPTED_PROTOCOLS = [81, 82];
 	const LOGIN_PACKET = 0x01;
 	const PLAY_STATUS_PACKET = 0x02;
 	const SERVER_TO_CLIENT_HANDSHAKE_PACKET = 0x03;
