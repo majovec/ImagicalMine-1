@@ -1,20 +1,36 @@
 <?php
 
+/*
+ *
+ *  _                       _           _ __  __ _
+ * (_)                     (_)         | |  \/  (_)
+ *  _ _ __ ___   __ _  __ _ _  ___ __ _| | \  / |_ _ __   ___
+ * | | '_ ` _ \ / _` |/ _` | |/ __/ _` | | |\/| | | '_ \ / _ \
+ * | | | | | | | (_| | (_| | | (_| (_| | | |  | | | | | |  __/
+ * |_|_| |_| |_|\__,_|\__, |_|\___\__,_|_|_|  |_|_|_| |_|\___|
+ *                     __/ |
+ *                    |___/
+ *
+ * This program is a third party build by ImagicalMine.
+ *
+ * PocketMine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * @author ImagicalMine Team
+ * @link http://forums.imagicalmine.net/
+ *
+ *
+*/
+
 namespace pocketmine\event\entity;
 
 use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
-use pocketmine\event\Cancellable;
-use pocketmine\math\Vector3;
-use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\event\Listener;
 
-class EntityDamageByEntityEvent extends EntityDamageEvent implements Listener
+class EntityDamageByEntityEvent extends EntityDamageEvent
 {
-    //EntityPosition
-    private $EntityPosition = new Vector3($this->getEntity()->getX(), $this->getEntity()->getY(), $this->getEntity()->getZ());
-    //DamagerPosition
-	private $DamagerPosition = new Vector3($this->getDamager()->getX(), $this->getDamager()->getY(), $this->getDamager()->getZ());
     /** @var Entity */
     private $damager;
     /** @var float */
@@ -60,10 +76,6 @@ class EntityDamageByEntityEvent extends EntityDamageEvent implements Listener
     {
         return $this->knockBack;
     }
-    public function cancelHit()
-    {
-        $this->setCancelled(true);
-    }
     /**
      * @param float $knockBack
      */
@@ -71,8 +83,11 @@ class EntityDamageByEntityEvent extends EntityDamageEvent implements Listener
     {
         $this->knockBack = $knockBack;
     }
+<<<<<<< HEAD
     public function cancelKnockBack()
     {
         $this->setKnockBack(0);
     }
+=======
+>>>>>>> parent of 727948d... EntityDamageByEntityEvent rewrite
 }
