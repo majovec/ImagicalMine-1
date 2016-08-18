@@ -172,28 +172,6 @@ class Vector3
 
     /**
      *
-     * @param Vector3 $pos
-     * @return unknown
-     */
-    public function getDistance(Vector3 $pos)
-    {
-        return $this->distance($pos);
-    }
-    
-
-    /**
-     *
-     * @param Vector3 $pos
-     * @return unknown
-     */
-    public function getDistanceSquared(Vector3 $pos)
-    {
-        return $this->distanceSquared($pos);
-    }
-
-
-    /**
-     *
      * @param Vector3|int $x
      * @param int         $y (optional)
      * @param int         $z (optional)
