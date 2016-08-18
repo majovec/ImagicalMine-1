@@ -83,11 +83,4 @@ class EntityDamageByEntityEvent extends EntityDamageEvent
     {
         $this->knockBack = $knockBack;
     }
-<<<<<<< HEAD
-    public function cancelKnockBack()
-    {
-        $this->setKnockBack(0);
-    }
-=======
->>>>>>> parent of 727948d... EntityDamageByEntityEvent rewrite
 }
