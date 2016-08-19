@@ -1,39 +1,5 @@
 <?php
-/**
- * src/pocketmine/Server.php
- *
- * @package default
- */
 
-
-/*
- *
- *  _                       _           _ __  __ _
- * (_)                     (_)         | |  \/  (_)
- *  _ _ __ ___   __ _  __ _ _  ___ __ _| | \  / |_ _ __   ___
- * | | '_ ` _ \ / _` |/ _` | |/ __/ _` | | |\/| | | '_ \ / _ \
- * | | | | | | | (_| | (_| | | (_| (_| | | |  | | | | | |  __/
- * |_|_| |_| |_|\__,_|\__, |_|\___\__,_|_|_|  |_|_|_| |_|\___|
- *                     __/ |
- *                    |___/
- *
- * This program is a third party build by ImagicalMine.
- *
- * ImagicalMine is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * @author ImagicalMine Team
- * @link http://forums.imagicalmine.net/
- *
- *
-*/
-
-/**
- * ImagicalMine is the Minecraft: PE multiplayer server software
- * Homepage: http://imagicalmine.net/
- */
 namespace pocketmine;
 
 use pocketmine\block\Block;
@@ -2586,7 +2552,7 @@ class Server {
 	public function addOnlinePlayer(Player $player) {
 		$this->playerList[$player->getRawUniqueId()] = $player;
 
-		$this->updatePlayerListData($player->getUniqueId(), $player->getId(), $player->getDisplayName(), $player->getSkinName(), $player->getSkinData());
+		$this->updatePlayerListData($player->getUniqueId(), $player->getId(), $player->getDisplayName(), $player->getskinID(), $player->getSkinData());
 	}
 
 
@@ -2610,15 +2576,15 @@ class Server {
 	 * @param UUID    $uuid
 	 * @param unknown $entityId
 	 * @param unknown $name
-	 * @param unknown $skinName
+	 * @param unknown $skinID
 	 * @param unknown $skinData
 	 * @param array   $players          (optional)
 	 * @param unknown $skinTransparency (optional)
 	 */
-	public function updatePlayerListData(UUID $uuid, $entityId, $name, $skinName, $skinData, array $players = null, $skinTransparency = false) {
+	public function updatePlayerListData(UUID $uuid, $entityId, $name, $skinID, $skinData, array $players = null, $skinTransparency = false) {
 		$pk = new PlayerListPacket();
 		$pk->type = PlayerListPacket::TYPE_ADD;
-		$pk->entries[] = [$uuid, $entityId, $name, $skinName, $skinData, $skinTransparency];
+		$pk->entries[] = [$uuid, $entityId, $name, $skinID, $skinData, $skinTransparency];
 		Server::broadcastPacket($players === null ? $this->playerList : $players, $pk);
 	}
 
@@ -2644,7 +2610,7 @@ class Server {
 		$pk = new PlayerListPacket();
 		$pk->type = PlayerListPacket::TYPE_ADD;
 		foreach ($this->playerList as $player) {
-			$pk->entries[] = [$player->getUniqueId(), $player->getId(), $player->getDisplayName(), $player->getSkinName(), $player->getSkinData(), $player->isSkinTransparent()];
+			$pk->entries[] = [$player->getUniqueId(), $player->getId(), $player->getDisplayName(), $player->getskinID(), $player->getSkinData(), $player->isSkinTransparent()];
 		}
 
 		$p->dataPacket($pk);
