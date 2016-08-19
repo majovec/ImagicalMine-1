@@ -47,7 +47,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder
     public $eyeHeight = 1.62;
 
     protected $skin;
-    protected $skinName;
+    protected $skinID;
     protected $skinTransparency = false;
 
     /**
@@ -64,9 +64,9 @@ class Human extends Creature implements ProjectileSource, InventoryHolder
      *
      * @return unknown
      */
-    public function getSkinName()
+    public function getSkinID()
     {
-        return $this->skinName;
+        return $this->skinID;
     }
 
 
@@ -103,13 +103,13 @@ class Human extends Creature implements ProjectileSource, InventoryHolder
     /**
      *
      * @param string  $str
-     * @param bool    $skinName
+     * @param bool    $skinID
      * @param bool    $skinTransparency (optional)
      */
-    public function setSkin($str, $skinName, $skinTransparency = false)
+    public function setSkin($str, $skinID, $skinTransparency = false)
     {
         $this->skin = $str;
-        $this->skinName = $skinName;
+        $this->skinID = $skinID;
         $this->skinTransparency = $skinTransparency;
     }
 
@@ -240,7 +240,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder
         if (strlen($this->getSkinData()) > 0) {
             $this->namedtag->Skin = new CompoundTag("Skin", [
                     "Data" => new StringTag("Data", $this->getSkinData()),
-                    "Name" => new ByteTag("Name", $this->getSkinName())
+                    "Name" => new ByteTag("Name", $this->getskinID())
                 ]);
         }
     }
@@ -261,10 +261,10 @@ class Human extends Creature implements ProjectileSource, InventoryHolder
 
 
             if (!($this instanceof Player)) {
-                $this->server->updatePlayerListData($this->getUniqueId(), $this->getId(), $this->getName(), $this->skinName, $this->skin, [$player]);
+                $this->server->updatePlayerListData($this->getUniqueId(), $this->getId(), $this->getName(), $this->skinID, $this->skin, [$player]);
             }
 
-            $this->server->updatePlayerListData($this->getUniqueId(), $this->getId(), $this->getName(), $this->skinName, $this->skin, [$player]);
+            $this->server->updatePlayerListData($this->getUniqueId(), $this->getId(), $this->getName(), $this->skinID, $this->skin, [$player]);
 
             $pk->username = $this->getName();
             $pk->eid = $this->getId();
