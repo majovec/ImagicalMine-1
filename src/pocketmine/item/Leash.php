@@ -1,7 +1,5 @@
 <?php
-
 namespace pocketmine\item;
-
 use pocketmine\entity\Animal;
 use pocketmine\entity\Entity;
 use pocketmine\level\Level;
@@ -13,13 +11,10 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\DoubleTag;
 use pocketmine\nbt\tag\FloatTag;
-
 class Leash extends Item{
-
 	public function __construct($meta = 0, $count = 1){
 		parent::__construct(self::LEAD, $meta, $count, "Leash");
 	}
-
 	public function useOnEntity(Entity $entity, Entity $origin){
 		if($entity instanceof Animal){
 			if($entity->isLeashableType()) $entity->setLeashHolder($origin);
