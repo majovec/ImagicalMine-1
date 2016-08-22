@@ -24,7 +24,6 @@
  *
 */
 
-<?php
 namespace pocketmine\network\protocol;
 
 use pocketmine\utils\Binary;
