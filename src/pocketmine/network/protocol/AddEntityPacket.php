@@ -30,7 +30,7 @@ namespace pocketmine\network\protocol;
 
 #ifndef COMPILE
 use pocketmine\utils\Binary;
-
+use pocketmine\entity\Entity
 #endif
 
 class AddEntityPacket extends DataPacket
