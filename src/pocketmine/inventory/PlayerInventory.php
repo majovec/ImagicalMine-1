@@ -708,10 +708,12 @@ class PlayerInventory extends BaseInventory
         }
 
         foreach ($this->getArmorContents() as $item) {
-            $protection += $item->getProtection();
-
-            if ($protectionEnch != null && ($ench = $item->getEnchantment($protectionEnch)) != null) {
-                $protection += floor((6 + $ench->getLevel()^2) * $modifier / 3);
+            $protection += $item->getEnchantment();
+            
+            if ($protection == Enchantment::TYPE_ARMOR_FIRE_PROTECTION || $protection == Enchantment::TYPE_ARMOR_FALL_PROTECTION || $protection == Enchantment::TYPE_ARMOR_PROJECTILE_PROTECTION || $protection == Enchantment::TYPE_ARMOR_EXPLOSION_PROTECTION) {
+                if ($protectionEnch != null && ($ench = $item->getEnchantment($protectionEnch)) != null) {
+                    $protection += floor((6 + $ench->getLevel()^2) * $modifier / 3);
+                }
             }
         }
 
