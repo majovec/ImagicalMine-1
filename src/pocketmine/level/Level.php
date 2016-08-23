@@ -720,7 +720,9 @@ class Level implements ChunkManager, Metadatable{
 		return true;
 	}
 
-
+	public function getUsingChunk($chunkX, $chunkZ){
+		return $this->getChunkPlayers($chunkX, $chunkZ);
+	}
 	/**
 	 * Gets the players being used in a specific chunk
 	 *
