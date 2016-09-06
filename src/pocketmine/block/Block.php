@@ -651,6 +651,8 @@ class Block extends Position implements Metadatable
             self::$list[self::STONECUTTER] = Stonecutter::class;
             self::$list[self::GLOWING_OBSIDIAN] = GlowingObsidian::class;
             self::$list[self::NETHER_REACTOR] = NetherReactor::class;
+            
+            self::$list[self::SLIME_BLOCK] = SlimeBlock::class;
             // self::$list[self::RESERVED] = Reserved::class;
 
             foreach (self::$list as $id => $class) {
