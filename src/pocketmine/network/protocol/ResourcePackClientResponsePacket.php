@@ -29,17 +29,19 @@ namespace pocketmine\network\protocol;
 #include <rules/DataPacket.h>
 
 
-class ChunkRadiusUpdatedPacket extends DataPacket{
-	const NETWORK_ID = Info::CHUNK_RADIUS_UPDATED_PACKET;
+class ResourcePackClientResponsePacket extends DataPacket{
+	const NETWORK_ID = Info::RESOURCE_PACK_CLIENT_RESPONSE_PACKET;
 
-	public $radius;
+	public $unknownByte;
+	public $unknownShort;
 
 	public function decode(){
+		$this->unknownByte = $this->getByte();
+		$this->unknownShort = $this->getShort();
 	}
 
 	public function encode(){
-		$this->reset();
-		$this->putVarInt($this->radius);
+
 	}
 
 }

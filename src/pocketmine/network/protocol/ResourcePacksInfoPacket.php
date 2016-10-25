@@ -29,17 +29,34 @@ namespace pocketmine\network\protocol;
 #include <rules/DataPacket.h>
 
 
-class ChunkRadiusUpdatedPacket extends DataPacket{
-	const NETWORK_ID = Info::CHUNK_RADIUS_UPDATED_PACKET;
+class ResourcePacksInfoPacket extends DataPacket{
+	const NETWORK_ID = Info::RESOURCE_PACKS_INFO_PACKET;
 
-	public $radius;
+	public $mustAccept = false; //force client to use selected resource packs
+	/** @var ResourcePackInfoEntry */
+	public $behaviourPackEntries = [];
+	/** @var ResourcePackInfoEntry */
+	public $resourcePackEntries = [];
 
 	public function decode(){
+
 	}
 
 	public function encode(){
 		$this->reset();
-		$this->putVarInt($this->radius);
-	}
 
+		$this->putBool($this->mustAccept);
+		$this->putShort(count($this->behaviourPackEntries));
+		foreach($this->behaviourPackEntries as $entry){
+			$this->putString($entry->getPackId());
+			$this->putString($entry->getVersion());
+			$this->putLong($entry->getUint64()); 
+		}
+		$this->putShort(count($this->resourcePackEntries));
+		foreach($this->resourcePackEntries as $entry){
+			$this->putString($entry->getPackId());
+			$this->putString($entry->getVersion());
+			$this->putLong($entry->getUint64()); 
+		}
+	}
 }

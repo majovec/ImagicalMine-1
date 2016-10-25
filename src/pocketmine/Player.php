@@ -1296,16 +1296,25 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
         $pk = new StartGamePacket();
         $pk->seed = -1;
+        $pk->entityUniqueId = $this->getId();
+        $pk->entityRuntimeId = $this->getId();
         $pk->x = $this->x;
         $pk->y = $this->y;
         $pk->z = $this->z;
-        $pk->spawnX = (int) $spawnPosition->x;
-        $pk->spawnY = (int) $spawnPosition->y;
-        $pk->spawnZ = (int) $spawnPosition->z;
-        $pk->generator = 1; // 0 old, 1 infinite, 2 flat
-        $pk->gamemode = $this->gamemode & 0x01;
-        $pk->eid = 0;
+        $pk->generator = 1;
+        $pk->worldGamemode = 0; //survival for now.
+        $pk->difficulty = 0;
+        $pk->spawnX = $spawnPosition->getFloorX();
+        $pk->spawnY = $spawnPosition->getFloorY();
+        $pk->spawnZ = $spawnPosition->getFloorZ();
+        $pk->hasBeenLoadedInCreative = 1;
+        $pk->dayCycleStopTime = -1;
+        $pk->eduMode = 0;
+        $pk->rainLevel = 0;
+        $pk->lightningLevel = 0;
+        $pk->commandsEnabled = 0;
         $this->dataPacket($pk);
+        $pk->unknown = "UNKNOWN";
         $this->sendSettings();
 
         if ($this->gamemode === Player::SPECTATOR) {

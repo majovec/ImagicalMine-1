@@ -28,18 +28,34 @@ namespace pocketmine\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class LevelSoundEventPacket extends DataPacket{
+	const NETWORK_ID = Info::LEVEL_SOUND_EVENT_PACKET;
 
-class ChunkRadiusUpdatedPacket extends DataPacket{
-	const NETWORK_ID = Info::CHUNK_RADIUS_UPDATED_PACKET;
-
-	public $radius;
+	public $sound;
+	public $x;
+	public $y;
+	public $z;
+	public $volume;
+	public $pitch;
+	public $unknownBool;
+	public $unknownBool2;
 
 	public function decode(){
+		$this->sound = $this->getByte();
+		$this->getVector3f($this->x, $this->y, $this->z);
+		$this->volume = $this->getVarInt();
+		$this->pitch = $this->getVarInt();
+		$this->unknownBool = $this->getBool();
+		$this->unknownBool2 = $this->getBool();
 	}
 
 	public function encode(){
 		$this->reset();
-		$this->putVarInt($this->radius);
+		$this->putByte($this->sound);
+		$this->putVector3f($this->x, $this->y, $this->z);
+		$this->putVarInt($this->volume);
+		$this->putVarInt($this->pitch);
+		$this->putBool($this->unknownBool);
+		$this->putBool($this->unknownBool2);
 	}
-
 }

@@ -28,18 +28,18 @@ namespace pocketmine\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class InventoryActionPacket extends DataPacket{
+	const NETWORK_ID = Info::INVENTORY_ACTION_PACKET;
 
-class ChunkRadiusUpdatedPacket extends DataPacket{
-	const NETWORK_ID = Info::CHUNK_RADIUS_UPDATED_PACKET;
-
-	public $radius;
+	public $unknown;
+	public $item;
 
 	public function decode(){
-	}
 
+	}
+	
 	public function encode(){
-		$this->reset();
-		$this->putVarInt($this->radius);
+		$this->putUnsignedVarInt($this->unknown);
+		$this->putSlot($this->item);
 	}
-
 }
