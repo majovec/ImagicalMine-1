@@ -2,7 +2,7 @@
  Full size img: http://i.imgur.com/emmkLHg.jpg
  
 ## ImagicalMine is a fork of [PocketMine-MP](https://github.com/pmmp/PocketMine-MP).<br>The 0.16.0 protocol changes were also forked from PocketMine.
-## Thanks to PocketMine dou to the most of the original code is written by them.
+## Thanks to PocketMine due to the most of the original code is written by them.
 
 [![Travis Build](https://travis-ci.org/Inactive-to-Reactive/ImagicalMine.svg)](https://travis-ci.org/Inactive-to-Reactive/ImagicalMine) <br>
 IN DEV: [![Build status](https://ci.appveyor.com/api/projects/status/vyarr1tt50639w0f/branch/master?svg=true)](https://ci.appveyor.com/project/remotevase/imagicalmine/branch/master) <br>
