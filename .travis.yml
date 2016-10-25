@@ -11,7 +11,7 @@ before_script:
 - phpenv config-rm xdebug.ini
 - mkdir plugins
 - wget -O plugins/DevTools.phar https://github.com/PocketMine/DevTools/releases/download/v1.11.0/DevTools_v1.11.0.phar
-- pecl install channel://pecl.php.net/pthreads-3.1.5
+- pecl install channel://pecl.php.net/pthreads-3.1.6
 - pecl install channel://pecl.php.net/weakref-0.3.1
 - echo | pecl install channel://pecl.php.net/yaml-2.0.0RC7
 
@@ -27,8 +27,8 @@ after_success:
 - mv $REPO_OWNER artifacts
 - git clone --branch=$PUSH_REPO_BRANCH https://github.com/$PUSH_REPO_OWNER/$PUSH_REPO_NAME
 # Artifacts upload starts here
-- cp /home/travis/build/artifacts/$REPO_NAME/plugins/DevTools//ImagicalMine_1.5.phar /home/travis/build/$PUSH_REPO_NAME/ImagicalMine-$TRAVIS_JOB_ID.phar
-- cp /home/travis/build/artifacts/$REPO_NAME/plugins/DevTools//ImagicalMine_1.5.phar /home/travis/build/$PUSH_REPO_NAME/service-download/ImagicalMine.phar
+- cp /home/travis/build/artifacts/$REPO_NAME/plugins/DevTools//ImagicalMine_1.6.phar /home/travis/build/$PUSH_REPO_NAME/ImagicalMine-$TRAVIS_JOB_ID.phar
+- cp /home/travis/build/artifacts/$REPO_NAME/plugins/DevTools//ImagicalMine_1.6.phar /home/travis/build/$PUSH_REPO_NAME/service-download/ImagicalMine.phar
 - cd $PUSH_REPO_NAME
 - git add ImagicalMine-$TRAVIS_JOB_ID.phar
 - git add service-download/ImagicalMine.phar
