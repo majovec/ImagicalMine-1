@@ -26,7 +26,7 @@ cat << "EOF"
 EOF
 
 # shopt -s extglob
-echo "system> Script by majovec!"
+echo "system> Script UPDATED by majovec!"
 echo "system> Welcome to ImagicalMine!"
 echo "system> The installer will guide you through installing ImagicalMine for your server!"
 echo
